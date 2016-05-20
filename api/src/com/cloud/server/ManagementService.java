@@ -46,6 +46,7 @@ import org.apache.cloudstack.api.command.admin.systemvm.StopSystemVmCmd;
 import org.apache.cloudstack.api.command.admin.systemvm.UpgradeSystemVMCmd;
 import org.apache.cloudstack.api.command.admin.vlan.ListVlanIpRangesCmd;
 import org.apache.cloudstack.api.command.user.address.ListPublicIpAddressesCmd;
+import org.apache.cloudstack.api.command.user.console.ListConsoleConnectionInfoCmd;
 import org.apache.cloudstack.api.command.user.config.ListCapabilitiesCmd;
 import org.apache.cloudstack.api.command.user.event.ArchiveEventsCmd;
 import org.apache.cloudstack.api.command.user.event.DeleteEventsCmd;
@@ -58,6 +59,7 @@ import org.apache.cloudstack.api.command.user.ssh.RegisterSSHKeyPairCmd;
 import org.apache.cloudstack.api.command.user.vm.GetVMPasswordCmd;
 import org.apache.cloudstack.api.command.user.vmgroup.UpdateVMGroupCmd;
 import org.apache.cloudstack.config.Configuration;
+import org.apache.cloudstack.console.ConsoleConnectionInfo;
 
 import com.cloud.alert.Alert;
 import com.cloud.capacity.Capacity;
@@ -435,5 +437,6 @@ public interface ManagementService {
 
     void cleanupVMReservations();
 
+    ConsoleConnectionInfo getConsoleConnectionInfo(ListConsoleConnectionInfoCmd cmd);
 
 }

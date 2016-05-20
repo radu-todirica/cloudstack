@@ -53,6 +53,7 @@ import org.apache.cloudstack.api.response.CapacityResponse;
 import org.apache.cloudstack.api.response.ClusterResponse;
 import org.apache.cloudstack.api.response.ConditionResponse;
 import org.apache.cloudstack.api.response.ConfigurationResponse;
+import org.apache.cloudstack.api.response.ConsoleConnectionInfoResponse;
 import org.apache.cloudstack.api.response.ControlledEntityResponse;
 import org.apache.cloudstack.api.response.ControlledViewEntityResponse;
 import org.apache.cloudstack.api.response.CounterResponse;
@@ -137,6 +138,7 @@ import org.apache.cloudstack.api.response.VpcOfferingResponse;
 import org.apache.cloudstack.api.response.VpcResponse;
 import org.apache.cloudstack.api.response.VpnUsersResponse;
 import org.apache.cloudstack.api.response.ZoneResponse;
+import org.apache.cloudstack.console.ConsoleConnectionInfo;
 import org.apache.cloudstack.config.Configuration;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStore;
@@ -3713,4 +3715,11 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setDomainName(domain.getName());
         return response;
     }
+
+    @Override
+    public ConsoleConnectionInfoResponse createConsoleConnectionInfoResponse(ConsoleConnectionInfo cci) {
+        return new ConsoleConnectionInfoResponse(cci);
+    }
+
+
 }

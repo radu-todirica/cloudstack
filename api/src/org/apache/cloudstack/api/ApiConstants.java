@@ -390,6 +390,8 @@ public class ApiConstants {
     public static final String KVM_NETWORK_LABEL = "kvmnetworklabel";
     public static final String VMWARE_NETWORK_LABEL = "vmwarenetworklabel";
     public static final String HYPERV_NETWORK_LABEL = "hypervnetworklabel";
+    public static final String HYPERV_HOST = "hypervhost";
+
     public static final String OVM3_NETWORK_LABEL = "ovm3networklabel";
     public static final String NETWORK_SERVICE_PROVIDER_ID = "nspid";
     public static final String SERVICE_LIST = "servicelist";
@@ -637,6 +639,11 @@ public class ApiConstants {
     public static final String ADMIN = "admin";
 
     public static final String SHOWHIDDEN = "showhidden";
+    public static final String CLIENTHOSTADDRESS = "clienthostaddress";
+    public static final String CLIENTHOSTPORT = "clienthostport";
+    public static final String CLIENTHOSTPASSSWORD = "clienthostpassword";
+    public static final String LOCALE = "locale";
+
 
     public enum HostDetails {
         all, capacity, events, stats, min;

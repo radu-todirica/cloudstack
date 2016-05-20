@@ -294,6 +294,7 @@ import org.apache.cloudstack.api.command.user.autoscale.ListCountersCmd;
 import org.apache.cloudstack.api.command.user.autoscale.UpdateAutoScalePolicyCmd;
 import org.apache.cloudstack.api.command.user.autoscale.UpdateAutoScaleVmGroupCmd;
 import org.apache.cloudstack.api.command.user.autoscale.UpdateAutoScaleVmProfileCmd;
+import org.apache.cloudstack.api.command.user.console.ListConsoleConnectionInfoCmd;
 import org.apache.cloudstack.api.command.user.config.ListCapabilitiesCmd;
 import org.apache.cloudstack.api.command.user.event.ArchiveEventsCmd;
 import org.apache.cloudstack.api.command.user.event.DeleteEventsCmd;
@@ -498,6 +499,7 @@ import org.apache.cloudstack.api.command.user.vpn.UpdateVpnCustomerGatewayCmd;
 import org.apache.cloudstack.api.command.user.vpn.UpdateVpnGatewayCmd;
 import org.apache.cloudstack.api.command.user.zone.ListZonesCmd;
 import org.apache.cloudstack.config.Configuration;
+import org.apache.cloudstack.console.ConsoleConnectionInfo;
 import org.apache.cloudstack.context.CallContext;
 import org.apache.cloudstack.engine.orchestration.service.VolumeOrchestrationService;
 import org.apache.cloudstack.engine.subsystem.api.storage.DataStoreManager;
@@ -602,6 +604,7 @@ import com.cloud.server.auth.UserAuthenticator;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
+import com.cloud.servlet.ConsoleProxyServlet;
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.GuestOS;
 import com.cloud.storage.GuestOSCategoryVO;
@@ -3027,6 +3030,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         cmdList.add(UpdateLBHealthCheckPolicyCmd.class);
         cmdList.add(GetUploadParamsForTemplateCmd.class);
         cmdList.add(GetUploadParamsForVolumeCmd.class);
+        cmdList.add(ListConsoleConnectionInfoCmd.class);
         return cmdList;
     }
 
@@ -4049,5 +4053,58 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
     public void setLockMasterListener(final LockMasterListener lockMasterListener) {
         _lockMasterListener = lockMasterListener;
     }
+
+    @Override
+    public ConsoleConnectionInfo getConsoleConnectionInfo(ListConsoleConnectionInfoCmd cmd) {
+        final Account caller = getCaller();
+
+        final VirtualMachine vm = _itMgr.findById(cmd.getVirtualMachineId());
+        if (vm == null) {
+            final InvalidParameterValueException ex = new InvalidParameterValueException("No VM with specified id found.");
+            ex.addProxyObject(cmd.getVirtualMachineId().toString(), "virtualmachineid");
+            throw ex;
+        }
+
+        // make permission check
+        _accountMgr.checkAccess(caller, null, true, vm);
+        HostVO host = getHostBy(vm.getHostId());
+        if (host == null) {
+            final InvalidParameterValueException ex = new InvalidParameterValueException("Cannot find host for specified VM.");
+            throw ex;
+        }
+        if (Hypervisor.HypervisorType.LXC.equals(vm.getHypervisorType())) {
+            final InvalidParameterValueException ex = new InvalidParameterValueException("Console access is not supported for LXC");
+            throw ex;
+        }
+
+        String hostip = host.getPrivateIpAddress();
+        ConsoleConnectionInfo cci = new ConsoleConnectionInfo();
+
+        String hostaddr = host.getPrivateIpAddress();
+        Pair<String, Integer> portInfo = getVncPort(vm);
+        Ternary<String, String, String> parsedHostInfo = ConsoleProxyServlet.parseHostInfo(portInfo.first());
+        String vncPassword = vm.getVncPassword();
+        cci.setClientHostAddress(parsedHostInfo.first());
+        if (vm.getType() == VirtualMachine.Type.User){
+            UserVmVO userVm = _userVmDao.findById(cmd.getVirtualMachineId());
+            cci.setDisplayName(userVm.getDisplayName());
+        } else {
+            cci.setDisplayName(vm.getHostName());
+        }
+        if (portInfo.second() == -9) {
+            // HyperV
+            cci.setClientHostPort(Integer.parseInt(findDetail(host.getId(), "rdp.server.port").getValue()));
+            cci.setHypervHost(hostip);
+            cci.setUsername(findDetail(host.getId(), "username").getValue());
+            cci.setPassword(findDetail(host.getId(), "password").getValue());
+        } else {
+            cci.setClientHostPort(portInfo.second());
+            cci.setClientHostPassword(vm.getVncPassword());
+        }
+        return cci;
+    }
+
+
+
 
 }

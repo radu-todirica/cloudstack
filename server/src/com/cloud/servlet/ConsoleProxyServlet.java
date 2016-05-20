@@ -337,15 +337,15 @@ public class ConsoleProxyServlet extends HttpServlet {
 
         if (hostInfo != null) {
             if (hostInfo.startsWith("consoleurl")) {
-            String tokens[] = hostInfo.split("&");
+                String tokens[] = hostInfo.split("&");
 
-            if (hostInfo.length() > 19 && hostInfo.indexOf('/', 19) > 19) {
-                host = hostInfo.substring(19, hostInfo.indexOf('/', 19)).trim();
-                tunnelUrl = tokens[0].substring("consoleurl=".length());
-                tunnelSession = tokens[1].split("=")[1];
-            } else {
-                host = "";
-            }
+                if (hostInfo.length() > 19 && hostInfo.indexOf('/', 19) > 19) {
+                    host = hostInfo.substring(19, hostInfo.indexOf('/', 19)).trim();
+                    tunnelUrl = tokens[0].substring("consoleurl=".length());
+                    tunnelSession = tokens[1].split("=")[1];
+                } else {
+                    host = "";
+                }
             } else if (hostInfo.startsWith("instanceId")) {
                 host = hostInfo.substring(hostInfo.indexOf('=') + 1);
             } else {
