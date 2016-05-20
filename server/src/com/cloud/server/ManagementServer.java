@@ -21,7 +21,6 @@ import com.cloud.host.HostVO;
 import com.cloud.storage.GuestOSHypervisorVO;
 import com.cloud.storage.GuestOSVO;
 import com.cloud.utils.Pair;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.component.PluggableService;
 import com.cloud.vm.VirtualMachine;
 

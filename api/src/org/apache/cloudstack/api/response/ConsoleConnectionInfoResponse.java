@@ -120,5 +120,4 @@ public class ConsoleConnectionInfoResponse extends BaseResponse {
         this.displayName = displayName;
     }
 
-
 }
