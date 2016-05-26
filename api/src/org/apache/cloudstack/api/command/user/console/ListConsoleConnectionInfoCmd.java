@@ -16,7 +16,7 @@ import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.response.ConsoleConnectionInfoResponse;
 import org.apache.cloudstack.console.ConsoleConnectionInfo;
 
-@APICommand(name="ListConsoleConnectionInfo", description="Lists connection information for a given virtual machine", responseObject=ConsoleConnectionInfoResponse.class,
+@APICommand(name="listConsoleConnectionInfo", description="Lists connection information for a given virtual machine", responseObject=ConsoleConnectionInfoResponse.class,
     requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListConsoleConnectionInfoCmd extends BaseCmd {
 
