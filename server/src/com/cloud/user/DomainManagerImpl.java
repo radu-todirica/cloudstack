@@ -54,10 +54,13 @@ import com.cloud.network.dao.NetworkDomainDao;
 import com.cloud.projects.ProjectManager;
 import com.cloud.projects.ProjectVO;
 import com.cloud.projects.dao.ProjectDao;
+import com.cloud.server.ResourceTag;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.dao.DiskOfferingDao;
+import com.cloud.tags.dao.ResourceTagDao;
+import com.cloud.tags.ResourceTagVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
@@ -107,6 +110,9 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
 
     @Inject
     MessageBus _messageBus;
+
+    @Inject
+    private ResourceTagDao _resourceTagDao;
 
     @Override
     public Domain getDomain(long domainId) {
@@ -339,6 +345,7 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
         }
     }
 
+    @SuppressWarnings("deprecation")
     private boolean cleanupDomain(Long domainId, Long ownerId) throws ConcurrentOperationException, ResourceUnavailableException {
         s_logger.debug("Cleaning up domain id=" + domainId);
         boolean success = true;
@@ -414,6 +421,14 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
             s_logger.debug("Failed to delete the shared networks as a part of domain id=" + domainId + " clenaup");
             return false;
         }
+
+        // take care of Tags.
+        final SearchBuilder<ResourceTagVO> tagSearch = _resourceTagDao.createSearchBuilder();
+        tagSearch.and("domainId", tagSearch.entity().getDomainId(), SearchCriteria.Op.EQ);
+        SearchCriteria<ResourceTagVO> tagsc = tagSearch.create();
+        tagsc.setParameters("domainId", domainId);
+
+        _resourceTagDao.expunge(tagsc);
 
         // don't remove the domain if there are accounts required cleanup
         boolean deleteDomainSuccess = true;
