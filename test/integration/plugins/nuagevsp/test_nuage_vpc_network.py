@@ -15,22 +15,22 @@
 # specific language governing permissions and limitations
 # under the License.
 
-""" Tests for basic VPC Network functionality with Nuage VSP SDN plugin
+""" Component tests for basic VPC Network functionality with Nuage VSP SDN plugin
 """
 # Import Local Modules
 from nuageTestCase import nuageTestCase
-from marvin.lib.base import Account
+from marvin.lib.base import Account, Zone
 # Import System Modules
 from nose.plugins.attrib import attr
 
 
-class TestVpcNetworkNuage(nuageTestCase):
+class TestNuageVpcNetwork(nuageTestCase):
     """ Test basic VPC Network functionality with Nuage VSP SDN plugin
     """
 
     @classmethod
-    def setUpClass(cls):
-        super(TestVpcNetworkNuage, cls).setUpClass()
+    def setUpClass(cls, zone=None):
+        super(TestNuageVpcNetwork, cls).setUpClass(zone=zone)
         return
 
     def setUp(self):
@@ -45,7 +45,7 @@ class TestVpcNetworkNuage(nuageTestCase):
 
     @attr(tags=["advanced", "nuagevsp"], required_hardware="false")
     def test_nuage_vpc_network(self):
-        """ Test Basic VPC Network Functionality with Nuage VSP SDN plugin
+        """ Test basic VPC Network functionality with Nuage VSP SDN plugin
         """
 
         # 1. Create Nuage VSP VPC offering, check if it is successfully created and enabled.
@@ -57,6 +57,7 @@ class TestVpcNetworkNuage(nuageTestCase):
         # 6. Deploy a VM in the created VPC network, check if the VM is successfully deployed and is in the "Running"
         #    state.
         # 7. Verify that the created ACL item is successfully implemented in Nuage VSP.
+        # 8. Delete all the created objects (cleanup).
 
         # Creating a VPC offering
         self.debug("Creating Nuage VSP VPC offering...")
@@ -91,9 +92,25 @@ class TestVpcNetworkNuage(nuageTestCase):
         self.check_VM_state(vm, state="Running")
 
         # VSD verification
-        self.verify_vsp_network(self.domain.id, vpc_network, vpc)
-        self.verify_vsp_router(vr)
-        self.verify_vsp_vm(vm)
+        self.verify_vsd_network(self.domain.id, vpc_network, vpc)
+        self.verify_vsd_router(vr)
+        self.verify_vsd_vm(vm)
 
         # VSD verification for ACL item
-        self.verify_vsp_firewall_rule(acl_item)
+        self.verify_vsd_firewall_rule(acl_item)
+
+    @attr(tags=["advanced", "nuagevsp", "multizone"], required_hardware="false")
+    def test_nuage_vpc_network_multizone(self):
+        """ Test basic VPC Network functionality with Nuage VSP SDN plugin on multiple zones
+        """
+
+        # Repeat the tests in the above testcase "test_nuage_vpc_network" on multiple zones
+
+        self.debug("Testing basic VPC Network functionality with Nuage VSP SDN plugin on multiple zones...")
+        zones = Zone.list(self.api_client)
+        if len(zones) == 1:
+            self.skipTest("There is only one Zone configured: skipping test")
+        for zone in zones:
+            self.debug("Zone - %s" % zone.name)
+            self.setUpClass(zone=zone)
+            self.test_nuage_vpc_network()

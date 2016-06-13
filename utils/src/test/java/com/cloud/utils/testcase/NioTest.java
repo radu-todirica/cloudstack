@@ -63,7 +63,7 @@ public class NioTest {
     // Test should fail in due time instead of looping forever
     private static final int TESTTIMEOUT = 60000;
 
-    final private int totalTestCount = 4;
+    final private int totalTestCount = 2;
     private int completedTestCount = 0;
 
     private NioServer server;
@@ -105,18 +105,11 @@ public class NioTest {
             Assert.fail(e.getMessage());
         }
 
-        /**
-         * The malicious client(s) tries to block NioServer's main IO loop
-         * thread until SSL handshake timeout value (from Link class, 15s) after
-         * which the valid NioClient(s) get the opportunity to make connection(s)
-         */
         for (int i = 0; i < totalTestCount; i++) {
             final NioClient maliciousClient = new NioMaliciousClient("NioMaliciousTestClient-" + i, "127.0.0.1", server.getPort(), 1, new NioMaliciousTestClient());
             maliciousClients.add(maliciousClient);
             maliciousExecutor.submit(new ThreadedNioClient(maliciousClient));
-        }
 
-        for (int i = 0; i < totalTestCount; i++) {
             final NioClient client = new NioClient("NioTestClient-" + i, "127.0.0.1", server.getPort(), 1, new NioTestClient());
             clients.add(client);
             clientExecutor.submit(new ThreadedNioClient(client));
