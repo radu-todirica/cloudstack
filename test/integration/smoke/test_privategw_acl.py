@@ -286,7 +286,7 @@ class TestPrivateGwACL(cloudstackTestCase):
         self.performVPCTests(vpc_off)
 
     @attr(tags=["advanced"], required_hardware="true")
-    def test_05_rvpc_privategw_check_interface(self):
+    def _test_05_rvpc_privategw_check_interface(self):
         self.logger.debug("Creating a Redundant VPC offering..")
         vpc_off = VpcOffering.create(
             self.apiclient,

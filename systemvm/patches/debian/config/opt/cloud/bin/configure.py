@@ -770,6 +770,7 @@ class CsForwardingRules(CsDataBag):
             self.forward_vr(rule)
 
     def forward_vr(self, rule):
+        #prefetch iptables variables
         public_fwinterface = self.getDeviceByIp(rule['public_ip'])
         internal_fwinterface = self.getDeviceByIp(rule['internal_ip'])
         public_fwports = self.portsToString(rule['public_ports'], ':')

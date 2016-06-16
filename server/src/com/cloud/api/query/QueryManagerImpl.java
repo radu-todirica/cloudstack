@@ -2620,11 +2620,11 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         if(currentVmOffering == null) return offerings;
         List<String> currentTagsList = StringUtils.csvTagsToList(currentVmOffering.getTags());
 
-        // New offerings should be a subset of existing storage tags. Discard offerings who are not.
+        // New service offering should have all the tags of the current service offering.
         List<ServiceOfferingJoinVO> filteredOfferings = new ArrayList<>();
         for (ServiceOfferingJoinVO offering : offerings){
-            List<String> tags = StringUtils.csvTagsToList(offering.getTags());
-            if(currentTagsList.containsAll(tags)){
+            List<String> newTagsList = StringUtils.csvTagsToList(offering.getTags());
+            if(newTagsList.containsAll(currentTagsList)){
                 filteredOfferings.add(offering);
             }
         }
@@ -3054,9 +3054,9 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
 
         boolean listAll = false;
         if (templateFilter != null && templateFilter == TemplateFilter.all) {
-            if (caller.getType() == Account.ACCOUNT_TYPE_NORMAL) {
+            if (caller.getType() != Account.ACCOUNT_TYPE_ADMIN) {
                 throw new InvalidParameterValueException("Filter " + TemplateFilter.all
-                        + " can be specified by admin only");
+                        + " can be specified by root admin only");
             }
             listAll = true;
         }

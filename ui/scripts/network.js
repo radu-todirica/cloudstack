@@ -5838,35 +5838,14 @@
                                         label: 'label.name'
                                     }
                                 }, {
-                                    id: {
-                                        label: 'label.id'
-                                    },
-                                    zonename: {
-                                        label: 'label.zone'
-                                    },
-                                    dns1: {
-                                        label: 'label.dns'
-                                    },
-                                    gateway: {
-                                        label: 'label.gateway'
-                                    },
-                                    publicip: {
-                                        label: 'label.public.ip'
-                                    },
-                                    guestipaddress: {
-                                        label: 'label.guest.ip'
-                                    },
-                                    linklocalip: {
-                                        label: 'label.linklocal.ip'
+                                    state: {
+                                        label: 'label.state'
                                     },
                                     hostname: {
                                         label: 'label.host'
                                     },
-                                    state: {
-                                        label: 'label.state'
-                                    },
-                                    serviceofferingname: {
-                                        label: 'label.service.offering'
+                                    linklocalip: {
+                                        label: 'label.linklocal.ip'
                                     },
                                     isredundantrouter: {
                                         label: 'label.redundant.router',
@@ -5877,6 +5856,30 @@
                                             return "No";
                                         }
                                     },
+                                    redundantstate: {
+                                        label: 'label.redundant.state'
+                                    },
+                                    id: {
+                                        label: 'label.id'
+                                    },
+                                    serviceofferingname: {
+                                        label: 'label.service.offering'
+                                    },
+                                    zonename: {
+                                        label: 'label.zone'
+                                    },
+                                    gateway: {
+                                        label: 'label.gateway'
+                                    },
+                                    publicip: {
+                                        label: 'label.public.ip'
+                                    },
+                                    guestipaddress: {
+                                        label: 'label.guest.ip'
+                                    },
+                                    dns1: {
+                                        label: 'label.dns'
+                                    },
                                     account: {
                                         label: 'label.account'
                                     },
@@ -5884,6 +5887,7 @@
                                         label: 'label.domain'
                                     }
                                 }],
+
                                 dataProvider: function(args) {
                                     $.ajax({
                                         url: createURL("listRouters&listAll=true&vpcid=" + args.context.vpc[0].id),
@@ -6051,7 +6055,7 @@
                                             var items = [];
                                             items.push({
                                                 id: '',
-                                                description: 'label.none'
+                                                description: _l('label.none')
                                             });
                                             items.push({
                                                 id: 'modp1024',
@@ -6119,7 +6123,7 @@
                                             var items = [];
                                             items.push({
                                                 id: '',
-                                                description: 'label.none'
+                                                description: _l('label.none')
                                             });
                                             items.push({
                                                 id: 'modp1024',
@@ -6400,7 +6404,7 @@
                                             var items = [];
                                             items.push({
                                                 id: '',
-                                                description: 'label.none'
+                                                description: _l('label.none')
                                             });
                                             items.push({
                                                 id: 'modp1024',
@@ -6468,7 +6472,7 @@
                                             var items = [];
                                             items.push({
                                                 id: '',
-                                                description: 'label.none'
+                                                description: _l('label.none')
                                             });
                                             items.push({
                                                 id: 'modp1024',

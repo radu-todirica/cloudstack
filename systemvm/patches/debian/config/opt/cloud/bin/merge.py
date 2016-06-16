@@ -280,19 +280,9 @@ class QueueFile:
     def __moveFile(self, origPath, path):
         if not os.path.exists(path):
             os.makedirs(path)
-  
-        originalName = os.path.basename(origPath)
+        timestamp = str(int(round(time.time())))
+        os.rename(origPath, path + "/" + self.fileName + "." + timestamp)
 
-        if originalName.count(".") == 1:
-            originalName += "." + str(uuid.uuid4())
-
-        zipped_file_name = path + "/" + originalName + ".gz"
-
-        with open(origPath, 'rb') as f_in, gzip.open(zipped_file_name, 'wb') as f_out:
-            shutil.copyfileobj(f_in, f_out)
-        os.remove(origPath)
-
-        logging.debug("Processed file written to %s", zipped_file_name)
 
 class PrivateGatewayHack:
 
