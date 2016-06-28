@@ -101,7 +101,6 @@ public class AccountDaoImpl extends GenericDaoBase<AccountVO, Long> implements A
     @Override
     public List<AccountVO> findCleanupsForRemovedAccounts(Long domainId) {
         SearchCriteria<AccountVO> sc = CleanupForRemovedAccountsSearch.create();
-        sc.setParameters("cleanup", true);
 
         if (domainId != null) {
             sc.setParameters("domainid", domainId);
