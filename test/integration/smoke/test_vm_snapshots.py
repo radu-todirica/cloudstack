@@ -149,13 +149,21 @@ class TestVmSnapshot(cloudstackTestCase):
         )
 
         time.sleep(self.services["sleep"])
+        
+        #KVM VM Snapshot needs to set snapshot with memory
+        if cls.hypervisor.lower() in (KVM.lower()):
+           MemorySnapshot = "true"
+        else:
+           MemorySnapshot = "false"
+        return
+        
 
         vm_snapshot = VmSnapshot.create(
             self.apiclient,
             self.virtual_machine.id,
-            "false",
+            self.MemorySnapshot,
             "TestSnapshot",
-            "Dsiplay Text"
+            "Display Text"
         )
         self.assertEqual(
             vm_snapshot.state,
@@ -213,13 +221,23 @@ class TestVmSnapshot(cloudstackTestCase):
             "Check the snapshot of vm is ready!"
         )
 
-        self.virtual_machine.stop(self.apiclient)
+        #We don't need to stop the VM when taking a VM Snapshot on KVM
+        if cls.hypervisor.lower() in (KVM.lower()):
+           pass
+        else:
+           self.virtual_machine.stop(self.apiclient)
+        return
 
         VmSnapshot.revertToSnapshot(
             self.apiclient,
             list_snapshot_response[0].id)
 
-        self.virtual_machine.start(self.apiclient)
+        #We don't need to start the VM when taking a VM Snapshot on KVM
+        if cls.hypervisor.lower() in (KVM.lower()):
+           pass
+        else:
+           self.virtual_machine.start(self.apiclient)
+        return
 
         try:
             ssh_client = self.virtual_machine.get_ssh_client(reconnect=True)
