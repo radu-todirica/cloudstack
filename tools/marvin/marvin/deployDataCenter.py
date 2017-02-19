@@ -207,10 +207,10 @@ class DeployDataCenters(object):
     def waitForHost(self, zoneId, clusterId):
         """
         Wait for the hosts in the zoneid, clusterid to be up
-        2 retries with 30s delay
+        20 retries with 30s delay
         """
         try:
-            retry, timeout = 2, 30
+            retry, timeout = 20, 30
             cmd = listHosts.listHostsCmd()
             cmd.clusterid, cmd.zoneid = clusterId, zoneId
             hosts = self.__apiClient.listHosts(cmd)
