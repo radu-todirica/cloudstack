@@ -2112,6 +2112,11 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 diskBusType = getGuestDiskModel(vmSpec.getPlatformEmulator());
                 s_logger.debug("disk bus type derived from getPlatformEmulator: " + vmSpec.getPlatformEmulator() + ", diskbustype is: "+diskBusType.toString());
             }
+
+            // I'm not sure why previously certain DATADISKs were hard-coded VIRTIO and others not, however this
+            // maintains existing functionality with the exception that SCSI will override VIRTIO.
+            DiskDef.DiskBus diskBusTypeData = (diskBusType == DiskDef.DiskBus.SCSI) ? diskBusType : DiskDef.DiskBus.VIRTIO;
+
             final DiskDef disk = new DiskDef();
             if (volume.getType() == Volume.Type.ISO) {
                 if (volPath == null) {
@@ -2141,7 +2146,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                     disk.defBlockBasedDisk(physicalDisk.getPath(), devId, diskBusType);
                 } else {
                     if (volume.getType() == Volume.Type.DATADISK) {
-                        disk.defFileBasedDisk(physicalDisk.getPath(), devId, DiskDef.DiskBus.VIRTIO, DiskDef.DiskFmtType.QCOW2);
+                        disk.defFileBasedDisk(physicalDisk.getPath(), devId, diskBusTypeData, DiskDef.DiskFmtType.QCOW2);
                     } else {
                         disk.defFileBasedDisk(physicalDisk.getPath(), devId, diskBusType, DiskDef.DiskFmtType.QCOW2);
                     }
