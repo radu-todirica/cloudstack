@@ -1345,6 +1345,37 @@ public class LibvirtVMDef {
         }
     }
 
+    public static class SCSIDef {
+        private short index = 0;
+        private int domain = 0;
+        private int bus = 0;
+        private int slot = 9;
+        private int function = 0;
+
+        public SCSIDef(short index, int domain, int bus, int slot, int function) {
+            this.index = index;
+            this.domain = domain;
+            this.bus = bus;
+            this.slot = slot;
+            this.function = function;
+        }
+
+        public SCSIDef() {
+
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder scsiBuilder = new StringBuilder();
+
+            scsiBuilder.append(String.format("<controller type='scsi' index='%d' mode='virtio-scsi'>\n", this.index ));
+            scsiBuilder.append(String.format("<address type='pci' domain='0x%04X' bus='0x%02X' slot='0x%02X' function='0x%01X'/>\n",
+                    this.domain, this.bus, this.slot, this.function ) );
+            scsiBuilder.append("</controller>");
+            return scsiBuilder.toString();
+        }
+    }
+
     public static class InputDef {
         private final String _type; /* tablet, mouse */
         private final String _bus; /* ps2, usb, xen */
