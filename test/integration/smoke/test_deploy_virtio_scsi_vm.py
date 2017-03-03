@@ -32,7 +32,11 @@ from marvin.lib.base import (Account,
                             Template,
                             DiskOffering,
                             StoragePool,
-                            Volume)
+                            Volume,
+                            Host,
+                            GuestOs)
+
+
 
 # utils - utility classes for common cleanup, external library wrappers etc
 from marvin.lib.utils import cleanup_resources, get_hypervisor_type, validateList
@@ -144,6 +148,14 @@ class TestDeployVirtioSCSIVM(cloudstackTestCase):
             mode=cls.zone.networktype
         )
 
+        hosts = Host.list(cls.apiclient, id=cls.virtual_machine.hostid)
+        if len(hosts) != 1:
+            assert False, "Could not find host with id " + cls.virtual_machine.hostid
+
+        cls.vmhost = hosts[0]
+
+
+
         password = cls.virtual_machine.resetPassword(cls.apiclient)
         cls.virtual_machine.username = "ubuntu"
         cls.virtual_machine.password = password
@@ -179,7 +191,7 @@ class TestDeployVirtioSCSIVM(cloudstackTestCase):
         return
 
     def verifyVirshState(self, diskcount):
-        host = self.virtual_machine.hostname
+        host = self.vmhost.ipaddress
         instancename = self.virtual_machine.instancename
         virshxml = self.getVirshXML(host, instancename)
 
@@ -207,7 +219,16 @@ class TestDeployVirtioSCSIVM(cloudstackTestCase):
                     self.assertEqual(con, scsiindex, "disk controller not equal to SCSI " \
                                      "controller index")
 
+    def verifyGuestState(self, diskcount):
+        ssh = self.virtual_machine.get_ssh_client(reconnect=True)
+        output = ssh.execute("lspci | grep \"Virtio SCSI\"")
+        self.assertTrue(len(output) > 0, "Could not find virtio scsi controller")
+        output = ssh.execute("lsblk -rS | grep sd")
+        for disk in output:
+            self.logger.debug("disk " + disk + " found")
 
+        self.assertEqual(len(output), diskcount,
+                         "Could not find appropriate number of scsi disks in guest")
 
     def getVirshXML(self, host, instancename):
         if host == None:
@@ -303,18 +324,47 @@ class TestDeployVirtioSCSIVM(cloudstackTestCase):
     def test_04_verify_guest_lspci(self):
         """ Verify that guest sees scsi controller and disks
         """
+
         if self.hypervisorNotSupported:
             self.skipTest
 
-        ssh = self.virtual_machine.get_ssh_client()
-        output = ssh.execute("lspci | grep \"Virtio SCSI\"")
-        self.assertTrue(len(output) > 0, "Could not find virtio scsi controller")
-        output = ssh.execute("lsblk -rS | grep sd")
-        for disk in output:
-            self.logger.debug("disk " + disk + " found")
+        self.verifyGuestState(3)
 
-        self.assertEqual(len(output), 3, "Could not find appropriate number of scsi disks in guest")
+    @attr(tags=["advanced", "advancedns", "smoke"], required_hardware="true")
+    def test_05_change_vm_ostype_restart(self):
+        """ Update os type to Ubuntu, change vm details rootdiskController
+            explicitly to scsi.
+        """
 
+        self.virtual_machine.stop(self.apiclient)
+        ostypes = GuestOs.listMapping(self.apiclient, hypervisor="kvm")
+        self.assertTrue(len(ostypes) > 0)
+
+        ostypeid = None
+        for ostype in ostypes:
+            if ostype.osdisplayname == "Ubuntu 16.04 (64-bit)":
+                ostypeid = ostype.ostypeid
+                break
+
+        self.assertIsNotNone(ostypeid,
+                             "Could not find ostypeid for Ubuntu 16.0.4 (64-bit) mapped to kvm")
+
+
+        self.virtual_machine.update(self.apiclient, ostypeid=ostypeid,
+                                    details=[{"rootDiskController":"scsi"}])
+
+        self.virtual_machine.start(self.apiclient)
+
+        self.verifyVirshState(3)
+
+    @attr(tags=["advanced", "advancedns", "smoke"], required_hardware="true")
+    def test_06_verify_guest_lspci_again(self):
+        """ Verify that guest sees scsi controller and disks after switching ostype and rdc
+        """
+        if self.hypervisorNotSupported:
+            self.skipTest
+
+        self.verifyGuestState(3)
 
 class CommandNonzeroException(Exception):
     def __init__(self, code, stderr):

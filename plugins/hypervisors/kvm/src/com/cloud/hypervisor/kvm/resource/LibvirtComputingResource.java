@@ -163,6 +163,7 @@ import com.cloud.utils.script.Script;
 import com.cloud.utils.ssh.SshHelper;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.PowerState;
+import com.cloud.vm.VmDetailConstants;
 
 /**
  * LibvirtComputingResource execute requests on the computing/routing host using
@@ -2060,8 +2061,15 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         final InputDef input = new InputDef("tablet", "usb");
         devices.addDevice(input);
 
+
+        DiskDef.DiskBus busT = getDiskModelFromVMDetail(vmTO);
+
+        if (busT == null) {
+            busT = getGuestDiskModel(vmTO.getPlatformEmulator());
+        }
+
         // If we're using virtio scsi, then we need to add a virtual scsi controller
-        if (getGuestDiskModel(vmTO.getPlatformEmulator()) == DiskDef.DiskBus.SCSI) {
+        if (busT == DiskDef.DiskBus.SCSI) {
             final SCSIDef sd = new SCSIDef((short)0, 0, 0, 9, 0);
             devices.addDevice(sd);
         }
@@ -2149,19 +2157,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             }
 
             // if params contains a rootDiskController key, use its value (this is what other HVs are doing)
-            DiskDef.DiskBus diskBusType = null;
-            final Map <String, String> params = vmSpec.getDetails();
-            if (params != null && params.get("rootDiskController") != null && !params.get("rootDiskController").isEmpty()) {
-                final String rootDiskController = params.get("rootDiskController");
-                s_logger.debug("Passed custom disk bus " + rootDiskController);
-                for (final DiskDef.DiskBus bus : DiskDef.DiskBus.values()) {
-                    if (bus.toString().equalsIgnoreCase(rootDiskController)) {
-                        s_logger.debug("Found matching enum for disk bus " + rootDiskController);
-                        diskBusType = bus;
-                        break;
-                    }
-                }
-            }
+            DiskDef.DiskBus diskBusType = getDiskModelFromVMDetail(vmSpec);
 
             if (diskBusType == null) {
                 diskBusType = getGuestDiskModel(vmSpec.getPlatformEmulator());
@@ -2996,6 +2992,25 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         } else {
             return false;
         }
+    }
+
+    public DiskDef.DiskBus getDiskModelFromVMDetail(final VirtualMachineTO vmTO) {
+        Map<String, String> details = vmTO.getDetails();
+        if (details == null) {
+            return null;
+        }
+
+        final String rootDiskController = details.get(VmDetailConstants.ROOT_DISK_CONTROLLER);
+        if (StringUtils.isNotBlank(rootDiskController)) {
+            s_logger.debug("Passed custom disk bus " + rootDiskController);
+            for (final DiskDef.DiskBus bus : DiskDef.DiskBus.values()) {
+                if (bus.toString().equalsIgnoreCase(rootDiskController)) {
+                    s_logger.debug("Found matching enum for disk bus " + rootDiskController);
+                    return bus;
+                }
+            }
+        }
+        return null;
     }
 
     private DiskDef.DiskBus getGuestDiskModel(final String platformEmulator) {
