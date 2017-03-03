@@ -361,7 +361,8 @@ class VirtualMachine:
                affinitygroupnames=None, affinitygroupids=None, group=None,
                hostid=None, keypair=None, ipaddress=None, mode='default',
                method='GET', hypervisor=None, customcpunumber=None,
-               customcpuspeed=None, custommemory=None, rootdisksize=None):
+               customcpuspeed=None, custommemory=None, rootdisksize=None,
+               rootdiskcontroller=None):
         """Create the instance"""
 
         cmd = deployVirtualMachine.deployVirtualMachineCmd()
@@ -464,6 +465,9 @@ class VirtualMachine:
 
         if rootdisksize >= 0:
             cmd.details[0]["rootdisksize"] = rootdisksize
+
+        if rootdiskcontroller:
+            cmd.details[0]["rootDiskController"] = rootdiskcontroller
 
         if group:
             cmd.group = group
