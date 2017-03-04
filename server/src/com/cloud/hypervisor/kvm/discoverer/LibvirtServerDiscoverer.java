@@ -164,7 +164,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
 
             sshConnection = new com.trilead.ssh2.Connection(agentIp, 22);
 
-            sshConnection.connect(null, 60000, 60000);
+            sshConnection.connect(null, 240000, 60000);
             if (!sshConnection.authenticateWithPassword(username, password)) {
                 s_logger.debug("Failed to authenticate");
                 throw new DiscoveredWithErrorException("Authentication error");
