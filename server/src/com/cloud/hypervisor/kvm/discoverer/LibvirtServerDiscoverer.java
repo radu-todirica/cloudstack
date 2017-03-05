@@ -221,6 +221,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
             if (!username.equals("root")) {
                 setupAgentCommand = "sudo cloudstack-setup-agent ";
             }
+            s_logger.debug("command: '" + setupAgentCommand + parameters + "'");
             if (!SSHCmdHelper.sshExecuteCmd(sshConnection,
                     setupAgentCommand + parameters, 3)) {
                 s_logger.info("cloudstack agent setup command failed: "
