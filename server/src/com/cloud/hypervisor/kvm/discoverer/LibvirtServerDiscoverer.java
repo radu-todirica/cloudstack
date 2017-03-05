@@ -282,7 +282,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
                 }
             }
             try {
-                Thread.sleep(30000);
+                Thread.sleep(60000);
             } catch (InterruptedException e) {
                 s_logger.debug("Failed to sleep: " + e.toString());
             }
