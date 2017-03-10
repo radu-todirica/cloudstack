@@ -218,6 +218,9 @@ class TestDeployVirtioSCSIVM(cloudstackTestCase):
                     con = child.get("controller")
                     self.assertEqual(con, scsiindex, "disk controller not equal to SCSI " \
                                      "controller index")
+                elif child.tag.lower() == "driver":
+                    discard = child.get("discard")
+                    self.assertEqual(discard, "unmap", "discard settings not unmap")
 
     def verifyGuestState(self, diskcount):
         ssh = self.virtual_machine.get_ssh_client(reconnect=True)
