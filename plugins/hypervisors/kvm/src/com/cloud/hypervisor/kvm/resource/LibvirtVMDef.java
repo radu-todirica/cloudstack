@@ -18,6 +18,7 @@ package com.cloud.hypervisor.kvm.resource;
 
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -566,6 +567,15 @@ public class LibvirtVMDef {
         private DiskCacheMode _diskCacheMode;
         private String _serial;
         private boolean qemuDriver = true;
+        private String _discard;
+
+        public String getDiscard() {
+            return _discard;
+        }
+
+        public void setDiscard(String discard) {
+            this._discard = discard;
+        }
 
         public void setDeviceType(DeviceType deviceType) {
             _deviceType = deviceType;
@@ -764,7 +774,11 @@ public class LibvirtVMDef {
             diskBuilder.append(">\n");
             if(qemuDriver) {
                 diskBuilder.append("<driver name='qemu'" + " type='" + _diskFmtType
-                        + "' cache='" + _diskCacheMode + "' " + "/>\n");
+                        + "' cache='" + _diskCacheMode + "' ");
+                if(StringUtils.isNotBlank(_discard)) {
+                    diskBuilder.append("discard='" + _discard + "' ");
+                }
+                diskBuilder.append("/>\n");
             }
 
             if (_diskType == DiskType.FILE) {

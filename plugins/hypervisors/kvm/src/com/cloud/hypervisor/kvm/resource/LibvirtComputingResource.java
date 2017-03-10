@@ -2178,6 +2178,11 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             } else {
                 final int devId = volume.getDiskSeq().intValue();
 
+                if (diskBusType == DiskDef.DiskBus.SCSI ) {
+                    disk.setQemuDriver(true);
+                    disk.setDiscard("unmap");
+                }
+
                 if (pool.getType() == StoragePoolType.RBD) {
                     /*
                             For RBD pools we use the secret mechanism in libvirt.
@@ -2363,17 +2368,19 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             } else {
                 DiskDef.DiskBus busT = DiskDef.DiskBus.VIRTIO;
                 for (final DiskDef disk : disks) {
-                    s_logger.debug("disk is type : "+disk.toString());
                     if (disk.getDeviceType() == DeviceType.DISK) {
                         if (disk.getBusType() == DiskDef.DiskBus.SCSI) {
                             busT = DiskDef.DiskBus.SCSI;
                         }
-                        s_logger.debug("Disk bus type: " + disk.getDeviceType().toString() + ", busT: "+busT.toString());
                         break;
                     }
                 }
 
                 diskdef = new DiskDef();
+                if (busT == DiskDef.DiskBus.SCSI) {
+                    diskdef.setQemuDriver(true);
+                    diskdef.setDiscard("unmap");
+                }
                 if (attachingPool.getType() == StoragePoolType.RBD) {
                     diskdef.defNetworkBasedDisk(attachingDisk.getPath(), attachingPool.getSourceHost(), attachingPool.getSourcePort(), attachingPool.getAuthUserName(),
                             attachingPool.getUuid(), devId, busT, DiskProtocol.RBD, DiskDef.DiskFmtType.RAW);
