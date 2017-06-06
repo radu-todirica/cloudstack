@@ -44,6 +44,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
+import org.apache.commons.validator.routines.RegexValidator;
 import org.apache.log4j.Logger;
 
 import com.cloud.utils.IteratorUtil;
@@ -1161,6 +1162,11 @@ public class NetUtils {
         // not in allowedNetBlocks - return false
         s_logger.warn("cidr " + cidr + " is not RFC 1918 or 6598 compliant");
         return false;
+    }
+
+    public static boolean isValidMac(final String macAddr) {
+            RegexValidator mv = new RegexValidator("^(?:[0-9a-f]{1,2}([-:\\.]))(?:[0-9a-f]{1,2}\\1){4}[0-9a-f]{1,2}$", false);
+            return mv.isValid(macAddr);
     }
 
     public static boolean verifyInstanceName(final String instanceName) {

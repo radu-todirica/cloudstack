@@ -172,6 +172,15 @@ public class NetUtilsTest {
     }
 
     @Test
+    public void testIsValidMacAddr() {
+        assertTrue(NetUtils.isValidMac("ee:12:34:5:32:ff"));
+        assertTrue(NetUtils.isValidMac("ee.12.34.5.32.ff"));
+        assertTrue(NetUtils.isValidMac("ee-12-34-5-32-ff"));
+        assertFalse(NetUtils.isValidMac("aa.12:34:5:32:ff"));
+        assertFalse(NetUtils.isValidMac("gg.gg:gg:gg:gg:gg"));
+    }
+
+    @Test
     public void testIsValidIpv6() {
         assertTrue(NetUtils.isValidIpv6("fc00::1"));
         assertFalse(NetUtils.isValidIpv6(""));

@@ -3249,16 +3249,16 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             if (requestedIpPair == null) {
                 requestedIpPair = new IpAddresses(null, null);
             } else {
-                _networkModel.checkRequestedIpAddresses(network.getId(), requestedIpPair.getIp4Address(), requestedIpPair.getIp6Address());
+                _networkModel.checkRequestedIpAddresses(network.getId(), requestedIpPair);
             }
 
-            NicProfile profile = new NicProfile(requestedIpPair.getIp4Address(), requestedIpPair.getIp6Address());
+            NicProfile profile = new NicProfile(requestedIpPair.getIp4Address(), requestedIpPair.getIp6Address(), requestedIpPair.getMacAddress());
 
             if (defaultNetworkNumber == 0) {
                 defaultNetworkNumber++;
                 // if user requested specific ip for default network, add it
                 if (defaultIps.getIp4Address() != null || defaultIps.getIp6Address() != null) {
-                    _networkModel.checkRequestedIpAddresses(network.getId(), defaultIps.getIp4Address(), defaultIps.getIp6Address());
+                    _networkModel.checkRequestedIpAddresses(network.getId(), defaultIps);
                     profile = new NicProfile(defaultIps.getIp4Address(), defaultIps.getIp6Address());
                 }
 
