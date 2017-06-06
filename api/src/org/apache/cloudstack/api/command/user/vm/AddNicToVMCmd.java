@@ -60,6 +60,9 @@ public class AddNicToVMCmd extends BaseAsyncCmd {
     @Parameter(name = ApiConstants.IP_ADDRESS, type = CommandType.STRING, description = "IP Address for the new network")
     private String ipaddr;
 
+    @Parameter(name = ApiConstants.MAC_ADDRESS, type = CommandType.STRING, description = "Mac Address for the new network")
+    private String macaddr;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -74,6 +77,10 @@ public class AddNicToVMCmd extends BaseAsyncCmd {
 
     public String getIpAddress() {
         return ipaddr;
+    }
+
+    public String getMacAddress() {
+        return macaddr;
     }
 
     /////////////////////////////////////////////////////
