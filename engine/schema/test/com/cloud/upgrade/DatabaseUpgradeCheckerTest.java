@@ -23,6 +23,7 @@ import com.cloud.upgrade.dao.Upgrade461to470;
 import com.cloud.upgrade.dao.Upgrade470to471;
 import com.cloud.upgrade.dao.Upgrade471to480;
 import com.cloud.upgrade.dao.Upgrade480to481;
+import com.cloud.upgrade.dao.Upgrade481to482;
 import com.cloud.upgrade.dao.Upgrade490to4910;
 import org.apache.cloudstack.utils.CloudStackVersion;
 import org.junit.Test;
@@ -114,9 +115,11 @@ public class DatabaseUpgradeCheckerTest {
         assertTrue(upgrades[3] instanceof Upgrade470to471);
         assertTrue(upgrades[4] instanceof Upgrade471to480);
         assertTrue(upgrades[5] instanceof Upgrade480to481);
+        assertTrue(upgrades[6] instanceof Upgrade481to482);
 
-        assertTrue(Arrays.equals(new String[] { "4.8.1", currentVersion.toString()}, upgrades[6].getUpgradableVersionRange()));
-        assertEquals(currentVersion.toString(), upgrades[6].getUpgradedVersion());
+
+        assertTrue(Arrays.equals(new String[] { "4.8.2", currentVersion.toString()}, upgrades[7].getUpgradableVersionRange()));
+        assertEquals(currentVersion.toString(), upgrades[7].getUpgradedVersion());
 
     }
 }
