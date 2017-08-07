@@ -79,9 +79,23 @@ public class Upgrade4930to41000 implements DbUpgrade {
 
     @Override
     public void performDataMigration(Connection conn) {
+        updateDomainRouterTable(conn);
         updateSystemVmTemplates(conn);
         populateGuestOsDetails(conn);
         updateSourceCidrs(conn);
+    }
+
+    private void updateDomainRouterTable(Connection conn){
+        final String alterTableSql = "ALTER TABLE `cloud`.`domain_router` ADD COLUMN  update_state varchar(64) DEFAULT NULL";
+        try (final PreparedStatement pstmt = conn.prepareStatement(alterTableSql)) {
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            if (e.getMessage().contains("update_state")) {
+                return;
+            } else {
+                throw new CloudRuntimeException("Unable to create column update_state in table cloud.domain_router", e);
+            }
+        }
     }
 
     @SuppressWarnings("serial")
