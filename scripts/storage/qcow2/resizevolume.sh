@@ -92,7 +92,7 @@ notifyqemu() {
     if `virsh domstate $vmname >/dev/null 2>&1`
     then
       sizeinkb=$(($newsize/1024))
-      virsh blockresize --domain $vmname --path $path --size $sizeinkb >/dev/null 2>&1
+      virsh blockresize --path $path --size $sizeinkb $vmname >/dev/null 2>&1
       retval=$?
       if [ -z $retval ] || [ $retval -ne 0 ]
       then
