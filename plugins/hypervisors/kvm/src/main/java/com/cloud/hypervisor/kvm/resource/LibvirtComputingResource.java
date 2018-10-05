@@ -2016,15 +2016,18 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         }
     }
     
-    protected enlightenWindowsVm() {
+    protected enlightenWindowsVm(FeaturesDef features) {
+    // If OS is Windows PV, then enable the features. Features supported on Windows 2008 and later
         if (vmTO.getOs().contains("Windows PV")) {
             LibvirtVMDef.HyperVEnlightenmentFeatureDef hyv = new LibvirtVMDef.HyperVEnlightenmentFeatureDef();
             hyv.setFeature("relaxed", true);
             hyv.setFeature("vapic", true);
             hyv.setFeature("spinlocks", true);
             hyv.setRetries(8096);
-           return hyv;
+           features.addHyperVFeature(hyv);
+          
             }
+        return features;
         }
 
     public LibvirtVMDef createVMFromSpec(final VirtualMachineTO vmTO) {
@@ -2112,11 +2115,10 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         features.addFeatures("pae");
         features.addFeatures("apic");
         features.addFeatures("acpi");
-        //for rhel 6.5 and above, hyperv enlightenment feature is added
-
-        final LibvirtVMDef.HyperVEnlightenmentFeatureDef hyv = new enlightenWindowsVm();
-        features.addHyperVFeature(hyv);
         
+        //KVM hyperv enlightenment features based on OS Type
+        features = enlightenWindowsVm(features);
+                
         vm.addComp(features);
 
         final TermPolicy term = new TermPolicy();
