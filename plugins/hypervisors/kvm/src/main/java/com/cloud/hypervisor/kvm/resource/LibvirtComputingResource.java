@@ -2015,7 +2015,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             s_logger.info("Setting quota=" + quota + ", period=" + period + " to VM domain " + vmTO.getUuid());
         }
     }
-    
+
     protected enlightenWindowsVm(VirtualMachineTO vmTO, FeaturesDef features) {
     // If OS is Windows PV, then enable the features. Features supported on Windows 2008 and later
         if (vmTO.getOs().contains("Windows PV")) {
@@ -2026,9 +2026,9 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             hyv.setRetries(8096);
             features.addHyperVFeature(hyv);
             s_logger.info("Enabling KVM Enlightment Features to VM domain " + vmTO.getUuid());
-           }
-        return features;
         }
+        return features;
+    }
 
     public LibvirtVMDef createVMFromSpec(final VirtualMachineTO vmTO) {
         final LibvirtVMDef vm = new LibvirtVMDef();
@@ -2115,10 +2115,10 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         features.addFeatures("pae");
         features.addFeatures("apic");
         features.addFeatures("acpi");
-        
+
         //KVM hyperv enlightenment features based on OS Type
         features = enlightenWindowsVm(vmTO, features);
-                
+
         vm.addComp(features);
 
         final TermPolicy term = new TermPolicy();
