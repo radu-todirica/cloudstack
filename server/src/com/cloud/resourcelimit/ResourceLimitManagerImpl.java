@@ -29,6 +29,9 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 
+import com.cloud.vm.UserVmDetailVO;
+import com.cloud.vm.VMInstanceVO;
+import com.cloud.vm.dao.UserVmDetailsDao;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -122,6 +125,10 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
     private ResourceLimitDao _resourceLimitDao;
     @Inject
     private UserVmDao _userVmDao;
+    @Inject
+    private VMInstanceDao _vmInstanceDao;
+    @Inject
+    private UserVmDetailsDao _userVmDetailsDao;
     @Inject
     private AccountDao _accountDao;
     @Inject
@@ -938,11 +945,38 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
         sc.setJoinParameters("offerings", "state", new Object[] {State.Destroyed, State.Error, State.Expunging});
         sc.setJoinParameters("offerings", "displayVm", 1);
         List<SumCount> cpus = _serviceOfferingDao.customSearch(sc, null);
+        long total = 0;
         if (cpus != null) {
-            return cpus.get(0).sum;
-        } else {
-            return 0;
+            total = cpus.get(0).sum;
         }
+
+        // check for custom offerings in vm details.
+
+        GenericSearchBuilder<UserVmDetailVO, SumCount> detailCpuSearch = _userVmDetailsDao.createSearchBuilder(SumCount.class);
+        detailCpuSearch.select("sum", Func.SUM, detailCpuSearch.entity().getValue());
+        detailCpuSearch.and("name", detailCpuSearch.entity().getName(), Op.EQ);
+
+        SearchBuilder<VMInstanceVO> join2 = _vmInstanceDao.createSearchBuilder();
+        join2.and("accountId", join2.entity().getAccountId(), Op.EQ);
+        join2.and("type", join2.entity().getType(), Op.EQ);
+        join2.and("state", join2.entity().getState(), SearchCriteria.Op.NIN);
+        join2.and("displayVm", join2.entity().isDisplayVm(), Op.EQ);
+
+
+        detailCpuSearch.join("vms", join2, detailCpuSearch.entity().getResourceId(), join2.entity().getId(),  JoinBuilder.JoinType.INNER);
+
+        sc = detailCpuSearch.create();
+        sc.setParameters("name", "cpuNumber");
+        sc.setJoinParameters("vms", "accountId", accountId);
+        sc.setJoinParameters("vms", "type", VirtualMachine.Type.User);
+        sc.setJoinParameters("vms", "state", new Object[] {State.Destroyed, State.Error, State.Expunging});
+        sc.setJoinParameters("vms", "displayVm", 1);
+
+        cpus = _userVmDetailsDao.customSearch(sc, null);
+        if (cpus != null) {
+            total += cpus.get(0).sum;
+        }
+        return total;
     }
 
     public long calculateMemoryForAccount(long accountId) {
@@ -962,11 +996,36 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
         sc.setJoinParameters("offerings", "state", new Object[] {State.Destroyed, State.Error, State.Expunging});
         sc.setJoinParameters("offerings", "displayVm", 1);
         List<SumCount> memory = _serviceOfferingDao.customSearch(sc, null);
+        long total = 0;
         if (memory != null) {
-            return memory.get(0).sum;
-        } else {
-            return 0;
+            total = memory.get(0).sum;
         }
+
+
+        // Check for dynamic offerings, go to vm details
+        GenericSearchBuilder<UserVmDetailVO, SumCount> detailMemorySearch = _userVmDetailsDao.createSearchBuilder(SumCount.class);
+        detailMemorySearch.select("sum", Func.SUM, detailMemorySearch.entity().getValue());
+        detailMemorySearch.and("name", detailMemorySearch.entity().getName(), Op.EQ);
+
+        SearchBuilder<VMInstanceVO> join2 = _vmInstanceDao.createSearchBuilder();
+        join2.and("accountId", join2.entity().getAccountId(), Op.EQ);
+        join2.and("type", join2.entity().getType(), Op.EQ);
+        join2.and("state", join2.entity().getState(), SearchCriteria.Op.NIN);
+        join2.and("displayVm", join2.entity().isDisplayVm(), Op.EQ);
+
+        detailMemorySearch.join("vms", join2, detailMemorySearch.entity().getResourceId(), join2.entity().getId(),  JoinBuilder.JoinType.INNER);
+        sc = detailMemorySearch.create();
+        sc.setParameters("name", "memory");
+        sc.setJoinParameters("vms", "accountId", accountId);
+        sc.setJoinParameters("vms", "type", VirtualMachine.Type.User);
+        sc.setJoinParameters("vms", "state", new Object[] {State.Destroyed, State.Error, State.Expunging});
+        sc.setJoinParameters("vms", "displayVm", 1);
+
+        memory = _userVmDetailsDao.customSearch(sc, null);
+        if (memory != null) {
+            total += memory.get(0).sum;
+        }
+        return total;
     }
 
     public long calculateSecondaryStorageForAccount(long accountId) {
