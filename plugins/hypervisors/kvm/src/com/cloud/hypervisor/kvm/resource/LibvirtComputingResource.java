@@ -1871,6 +1871,19 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         return uuid;
     }
 
+    protected void enlightenWindowsVm(VirtualMachineTO vmTO, FeaturesDef features) {
+    // If OS is Windows PV, then enable the features. Features supported on Windows 2008 and later
+        if (vmTO.getOs().contains("Windows PV")) {
+            LibvirtVMDef.HyperVEnlightenmentFeatureDef hyv = new LibvirtVMDef.HyperVEnlightenmentFeatureDef();
+            hyv.setFeature("relaxed", true);
+            hyv.setFeature("vapic", true);
+            hyv.setFeature("spinlocks", true);
+            hyv.setRetries(8096);
+            features.addHyperVFeature(hyv);
+            s_logger.info("Enabling KVM Enlightment Features to VM domain " + vmTO.getUuid());
+        }
+    }
+
     public LibvirtVMDef createVMFromSpec(final VirtualMachineTO vmTO) {
         final LibvirtVMDef vm = new LibvirtVMDef();
         vm.setDomainName(vmTO.getName());
@@ -1953,16 +1966,10 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         features.addFeatures("pae");
         features.addFeatures("apic");
         features.addFeatures("acpi");
-        //for rhel 6.5 and above, hyperv enlightenment feature is added
 
-        if (vmTO.getOs().contains("Windows PV")) {
-            LibvirtVMDef.HyperVEnlightenmentFeatureDef hyv = new LibvirtVMDef.HyperVEnlightenmentFeatureDef();
-            hyv.setFeature("relaxed", true);
-            hyv.setFeature("vapic", true);
-            hyv.setFeature("spinlocks", true);
-            hyv.setRetries(8096);
-            features.addHyperVFeature(hyv);
-        }
+
+        //KVM hyperv enlightenment features based on OS Type
+        enlightenWindowsVm(vmTO, features);
 
         vm.addComp(features);
 
