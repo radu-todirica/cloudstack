@@ -235,6 +235,9 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     protected String _localStorageUUID;
     protected boolean _noMemBalloon = false;
     protected String _guestCpuMode;
+    protected String _loader;
+    protected String _nvram;
+    protected boolean _efi = false;
     protected String _guestCpuModel;
     protected boolean _noKvmClock;
     protected String _videoHw;
@@ -861,6 +864,12 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 }
             }
         }
+
+        _loader = (String)params.get("guest.loader.image");
+
+        _efi = Boolean.parseBoolean((String)params.get("guest.loader.efi"));
+
+        _nvram = (String)params.get("guest.loader.nvram");
 
         final String[] info = NetUtils.getNetworkParams(_privateNic);
 
@@ -1910,6 +1919,9 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         guest.setUuid(uuid);
         guest.setBootOrder(GuestDef.BootOrder.CDROM);
         guest.setBootOrder(GuestDef.BootOrder.HARDISK);
+        guest.setLoader(_loader);
+        guest.setEfi(_efi);
+        guest.setNvram(_nvram);
 
         vm.addComp(guest);
 
