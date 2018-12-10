@@ -1919,10 +1919,11 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         guest.setUuid(uuid);
         guest.setBootOrder(GuestDef.BootOrder.CDROM);
         guest.setBootOrder(GuestDef.BootOrder.HARDISK);
-        guest.setLoader(_loader);
-        guest.setEfi(_efi);
-        guest.setNvram(_nvram);
-
+        if (vmTO.getType() == VirtualMachine.Type.User) {
+            guest.setLoader(_loader);
+            guest.setEfi(_efi);
+            guest.setNvram(_nvram);
+        }
         vm.addComp(guest);
 
         final GuestResourceDef grd = new GuestResourceDef();
