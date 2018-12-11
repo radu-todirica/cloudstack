@@ -24,4 +24,5 @@ public interface VmDetailConstants {
     public static final String HYPERVISOR_TOOLS_VERSION = "hypervisortoolsversion";
     public static final String DATA_DISK_CONTROLLER = "dataDiskController";
     public static final String VIRTIO_SCSI_DRIVER_QUEUES = "virtioScsiDriverQueues";
+    public static final String BOOT_EFI = "efi";
 }

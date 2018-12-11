@@ -1893,6 +1893,20 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         }
     }
 
+    protected void setEFIFromDetails(final VirtualMachineTO vmTO, final GuestDef guest) {
+        Map<String, String> details = vmTO.getDetails();
+        if (details == null) {
+            return;
+        }
+
+        if(Boolean.parseBoolean(details.get(VmDetailConstants.BOOT_EFI))) {
+            s_logger.debug("Enabling EFI");
+            guest.setLoader(_loader);
+            guest.setEfi(_efi);
+            guest.setNvram(_nvram);
+        }
+    }
+
     public LibvirtVMDef createVMFromSpec(final VirtualMachineTO vmTO) {
         final LibvirtVMDef vm = new LibvirtVMDef();
         vm.setDomainName(vmTO.getName());
@@ -1920,9 +1934,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         guest.setBootOrder(GuestDef.BootOrder.CDROM);
         guest.setBootOrder(GuestDef.BootOrder.HARDISK);
         if (vmTO.getType() == VirtualMachine.Type.User) {
-            guest.setLoader(_loader);
-            guest.setEfi(_efi);
-            guest.setNvram(_nvram);
+            setEFIFromDetails(vmTO, guest);
         }
         vm.addComp(guest);
 
