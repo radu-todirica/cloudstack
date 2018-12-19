@@ -149,6 +149,16 @@ public class SnapshotObject implements SnapshotInfo {
         return physicalSize;
     }
 
+    public boolean markBackedUp() {
+        try {
+            processEvent(Event.OperationNotPerformed);
+        } catch (NoTransitionException ex) {
+            s_logger.error("no transition error: ", ex);
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public VolumeInfo getBaseVolume() {
         return volFactory.getVolume(snapshot.getVolumeId());
