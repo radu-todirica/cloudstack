@@ -1440,6 +1440,9 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     static final ConfigKey<Boolean> VolumeUrlCheck = new ConfigKey<Boolean>("Advanced", Boolean.class, "volume.url.check", "true",
             "Check the url for a volume before downloading it from the management server. Set to flase when you managment has no internet access.", true);
 
+    public static final ConfigKey<Boolean> BackupSnapshotAfterTakingSnapshot = new ConfigKey<Boolean>(Boolean.class, "snapshot.backup.to.secondary",  "Snapshots", "true",
+            "Indicates whether to always backup primary storage snapshot to secondary storage", false, ConfigKey.Scope.Global, null);
+
     @Override
     public ConfigKey<?>[] getConfigKeys() {
         return new ConfigKey<?>[] {RecreatableSystemVmEnabled, MaxVolumeSize, StorageHAMigrationEnabled, StorageMigrationEnabled, CustomDiskOfferingMaxSize, CustomDiskOfferingMinSize, VolumeUrlCheck};
