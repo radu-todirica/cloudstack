@@ -149,6 +149,7 @@ public class SnapshotObject implements SnapshotInfo {
         return physicalSize;
     }
 
+    @Override
     public boolean markBackedUp() {
         try {
             processEvent(Event.OperationNotPerformed);
