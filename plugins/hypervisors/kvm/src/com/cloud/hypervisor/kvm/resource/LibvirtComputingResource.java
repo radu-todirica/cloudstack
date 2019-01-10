@@ -2026,8 +2026,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
         // If we're using virtio scsi, then we need to add a virtual scsi controller
         if (busT == DiskDef.DiskBus.SCSI) {
-            int queues = getVirtioSCSIDriverQueuesFromVMDetail(vmTO);
-            final SCSIDef sd = new SCSIDef((short)0, 0, 0, 9, 0, queues);
+             final SCSIDef sd = new SCSIDef((short)0, 0, 0, 9, 0, vcpus);
             devices.addDevice(sd);
         }
 
