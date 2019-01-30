@@ -30,7 +30,9 @@ import org.apache.cloudstack.storage.datastore.PrimaryDataStoreImpl;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 import org.apache.cloudstack.storage.volume.VolumeObject;
+import org.apache.commons.lang.SystemUtils;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -181,16 +183,19 @@ public class KvmNonManagedStorageSystemDataMotionTest {
 
     @Test
     public void generateDestPathTest() {
+        Assume.assumeTrue(SystemUtils.IS_OS_LINUX);
         configureAndVerifygenerateDestPathTest(true, false);
     }
 
     @Test(expected = CloudRuntimeException.class)
     public void generateDestPathTestExpectCloudRuntimeException() {
+        Assume.assumeTrue(SystemUtils.IS_OS_LINUX);
         configureAndVerifygenerateDestPathTest(false, false);
     }
 
     @Test(expected = CloudRuntimeException.class)
     public void generateDestPathTestExpectCloudRuntimeException2() {
+        Assume.assumeTrue(SystemUtils.IS_OS_LINUX);
         configureAndVerifygenerateDestPathTest(false, true);
     }
 

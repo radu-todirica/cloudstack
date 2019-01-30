@@ -118,6 +118,10 @@ public class MockServer implements Runnable {
                         final SSLSocketFactory sslSocketFactory = (SSLSocketFactory)SSLSocketFactory.getDefault();
                         SSLSocket sslSocket = (SSLSocket)sslSocketFactory.createSocket(socket, null, serverSocket.getLocalPort(), true);
                         sslSocket.setEnabledCipherSuites(sslSocket.getSupportedCipherSuites());
+                        System.out.println("server side cipher suites:");
+                        for (String st : sslSocket.getSupportedCipherSuites()) {
+                            System.out.println(st);
+                        }
                         sslSocket.setUseClientMode(false);
                         sslSocket.startHandshake();
                         is = sslSocket.getInputStream();

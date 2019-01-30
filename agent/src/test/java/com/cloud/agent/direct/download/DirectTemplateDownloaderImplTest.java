@@ -23,6 +23,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.nio.file.Paths;
+
 @RunWith(MockitoJUnitRunner.class)
 public class DirectTemplateDownloaderImplTest {
 
@@ -31,6 +33,6 @@ public class DirectTemplateDownloaderImplTest {
     @Test
     public void testGetDirectDownloadTempPath() {
         String path = DirectTemplateDownloaderImpl.getDirectDownloadTempPath(templateId);
-        Assert.assertEquals("template/2/202", path);
+        Assert.assertEquals(Paths.get("template", "2","202").toString(), path);
     }
 }

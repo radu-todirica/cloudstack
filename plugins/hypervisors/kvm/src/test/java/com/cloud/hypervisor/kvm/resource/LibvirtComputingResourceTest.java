@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -367,7 +368,7 @@ public class LibvirtComputingResourceTest {
            Calling configure is also not possible since that looks for certain files on the system which are not present
            during testing
          */
-        assertXpath(domainDoc, "/domain/devices/channel/source/@path", "/var/run/qemu/" + to.getName() + ".org.qemu.guest_agent.0");
+        assertXpath(domainDoc, "/domain/devices/channel/source/@path", Paths.get(File.separator+"var","run","qemu",to.getName()+".org.qemu.guest_agent.0").toString());
         assertXpath(domainDoc, "/domain/devices/channel/target/@name", "org.qemu.guest_agent.0");
 
         assertXpath(domainDoc, "/domain/memory/text()", String.valueOf( to.getMaxRam() / 1024 ));

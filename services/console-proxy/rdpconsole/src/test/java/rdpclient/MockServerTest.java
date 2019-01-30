@@ -155,11 +155,16 @@ public class MockServerTest extends TestCase {
 
             // Upgrade connection to SSL and send mock data
             {
-                //System.setProperty("javax.net.debug", "ssl");
+                System.setProperty("javax.net.debug", "ssl");
 
                 final SSLSocketFactory sslSocketFactory = (SSLSocketFactory)SSLSocketFactory.getDefault();
                 SSLSocket sslSocket = (SSLSocket)sslSocketFactory.createSocket(socket, address.getHostName(), address.getPort(), true);
                 sslSocket.setEnabledCipherSuites(sslSocket.getSupportedCipherSuites());
+
+                System.out.println("supported cipher suites:");
+                for (String st : sslSocket.getSupportedCipherSuites()) {
+                    System.out.println(st);
+                }
                 sslSocket.startHandshake();
 
                 InputStream is = sslSocket.getInputStream();
