@@ -205,17 +205,33 @@
                                                 var $maxIops = $form.find('.form-item[rel=maxIops]');
                                                 var $hypervisorSnapshotReserve = $form.find('.form-item[rel=hypervisorSnapshotReserve]');
                                                 var $diskBytesReadRate = $form.find('.form-item[rel=diskBytesReadRate]');
+                                                var $diskBytesReadRateMax = $form.find('.form-item[rel=diskBytesReadRateMax]');
+                                                var $diskBytesReadRateMaxLength = $form.find('.form-item[rel=diskBytesReadRateMaxLength]');
                                                 var $diskBytesWriteRate = $form.find('.form-item[rel=diskBytesWriteRate]');
+                                                var $diskBytesWriteRateMax = $form.find('.form-item[rel=diskBytesWriteRateMax]');
+                                                var $diskBytesWriteRateMaxLength = $form.find('.form-item[rel=diskBytesWriteRateMaxLength]');
                                                 var $diskIopsReadRate = $form.find('.form-item[rel=diskIopsReadRate]');
+                                                var $diskIopsReadRateMax = $form.find('.form-item[rel=diskIopsReadRateMax]');
+                                                var $diskIopsReadRateMaxLength = $form.find('.form-item[rel=diskIopsReadRateMaxLength]');
                                                 var $diskIopsWriteRate = $form.find('.form-item[rel=diskIopsWriteRate]');
+                                                var $diskIopsWriteRateMax = $form.find('.form-item[rel=diskIopsWriteRateMax]');
+                                                var $diskIopsWriteRateMaxLength = $form.find('.form-item[rel=diskIopsWriteRateMaxLength]');
 
                                                 var qosId = $(this).val();
 
                                                 if (qosId == 'storage') { // Storage QoS
                                                     $diskBytesReadRate.hide();
+                                                    $diskBytesReadRateMax.hide();
+                                                    $diskBytesReadRateMaxLength.hide();
                                                     $diskBytesWriteRate.hide();
+                                                    $diskBytesWriteRateMax.hide();
+                                                    $diskBytesWriteRateMaxLength.hide();
                                                     $diskIopsReadRate.hide();
+                                                    $diskIopsReadRateMax.hide();
+                                                    $diskIopsReadRateMaxLength.hide();
                                                     $diskIopsWriteRate.hide();
+                                                    $diskIopsWriteRateMax.hide();
+                                                    $diskIopsWriteRateMaxLength.hide();
 
                                                     $isCustomizedIops.css('display', 'inline-block');
 
@@ -235,14 +251,30 @@
                                                     $hypervisorSnapshotReserve.hide();
 
                                                     $diskBytesReadRate.css('display', 'inline-block');
+                                                    $diskBytesReadRateMax.css('display', 'inline-block');
+                                                    $diskBytesReadRateMaxLength.css('display', 'inline-block');
                                                     $diskBytesWriteRate.css('display', 'inline-block');
+                                                    $diskBytesWriteRateMax.css('display', 'inline-block');
+                                                    $diskBytesWriteRateMaxLength.css('display', 'inline-block');
                                                     $diskIopsReadRate.css('display', 'inline-block');
+                                                    $diskIopsReadRateMax.css('display', 'inline-block');
+                                                    $diskIopsReadRateMaxLength.css('display', 'inline-block');
                                                     $diskIopsWriteRate.css('display', 'inline-block');
+                                                    $diskIopsWriteRateMax.css('display', 'inline-block');
+                                                    $diskIopsWriteRateMaxLength.css('display', 'inline-block');
                                                 } else { // No Qos
                                                     $diskBytesReadRate.hide();
+                                                    $diskBytesReadRateMax.hide();
+                                                    $diskBytesReadRateMaxLength.hide();
                                                     $diskBytesWriteRate.hide();
+                                                    $diskBytesWriteRateMax.hide();
+                                                    $diskBytesWriteRateMaxLength.hide()
                                                     $diskIopsReadRate.hide();
+                                                    $diskIopsReadRateMax.hide();
+                                                    $diskIopsReadRateMaxLength.hide();
                                                     $diskIopsWriteRate.hide();
+                                                    $diskIopsWriteRateMax.hide();
+                                                    $diskIopsWriteRateMaxLength.hide();
                                                     $isCustomizedIops.hide();
                                                     $minIops.hide();
                                                     $maxIops.hide();
@@ -292,9 +324,41 @@
                                             number: true
                                         }
                                     },
+                                    diskBytesReadRateMax: {
+                                        label: 'label.disk.bytes.read.rate.max',
+                                        docID: 'helpComputeOfferingDiskBytesReadRateMax',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },
+                                    diskBytesReadRateMaxLength: {
+                                        label: 'label.disk.bytes.read.rate.max.length',
+                                        docID: 'helpComputeOfferingDiskBytesReadRateMaxLength',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },
                                     diskBytesWriteRate: {
                                         label: 'label.disk.bytes.write.rate',
                                         docID: 'helpComputeOfferingDiskBytesWriteRate',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },
+                                    diskBytesWriteRateMax: {
+                                        label: 'label.disk.bytes.write.rate.max',
+                                        docID: 'helpComputeOfferingDiskBytesWriteRateMax',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },
+                                    diskBytesWriteRateMaxLength: {
+                                        label: 'label.disk.bytes.write.rate.max.length',
+                                        docID: 'helpComputeOfferingDiskBytesWriteRateMaxLength',
                                         validation: {
                                             required: false, //optional
                                             number: true
@@ -308,9 +372,41 @@
                                             number: true
                                         }
                                     },
+                                    diskIopsReadRateMax: {
+                                        label: 'label.disk.iops.read.rate.max',
+                                        docID: 'helpComputeOfferingDiskIopsReadRateMax',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },
+                                    diskIopsReadRateMaxLength: {
+                                        label: 'label.disk.iops.read.rate.max.length',
+                                        docID: 'helpComputeOfferingDiskIopsReadRateMaxLength',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },
                                     diskIopsWriteRate: {
                                         label: 'label.disk.iops.write.rate',
                                         docID: 'helpComputeOfferingDiskIopsWriteRate',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },
+                                    diskIopsWriteRateMax: {
+                                        label: 'label.disk.iops.write.rate.max',
+                                        docID: 'helpComputeOfferingDiskIopsWriteRateMax',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },
+                                    diskIopsWriteRateMaxLength: {
+                                        label: 'label.disk.iops.write.rate.max.length',
+                                        docID: 'helpComputeOfferingDiskIopsWriteRateMaxLength',
                                         validation: {
                                             required: false, //optional
                                             number: true
@@ -670,11 +766,27 @@
                                         $.extend(data, {
                                             bytesreadrate: args.data.diskBytesReadRate
                                         });
+                                    }if (args.data.diskBytesReadRateMax != null && args.data.diskBytesReadRateMax.length > 0) {
+                                        $.extend(data, {
+                                            bytesreadratemax: args.data.diskBytesReadRateMax
+                                        });
+                                    }if (args.data.diskBytesReadRateMaxLength != null && args.data.diskBytesReadRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            bytesreadratemaxlength: args.data.diskBytesReadRateMaxLength
+                                        });
                                     }
 
                                     if (args.data.diskBytesWriteRate != null && args.data.diskBytesWriteRate.length > 0) {
                                         $.extend(data, {
                                             byteswriterate: args.data.diskBytesWriteRate
+                                        });
+                                    }if (args.data.diskBytesWriteRateMax != null && args.data.diskBytesWriteRateMax.length > 0) {
+                                        $.extend(data, {
+                                            byteswriteratemax: args.data.diskBytesWriteRateMax
+                                        });
+                                    }if (args.data.diskBytesWriteRateMaxLength != null && args.data.diskBytesWriteRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            byteswriteratemaxlength: args.data.diskBytesWriteRateMaxLength
                                         });
                                     }
 
@@ -682,11 +794,27 @@
                                         $.extend(data, {
                                             iopsreadrate: args.data.diskIopsReadRate
                                         });
+                                    }if (args.data.diskIopsReadRateMax != null && args.data.diskIopsReadRateMax.length > 0) {
+                                        $.extend(data, {
+                                            iopsreadratemax: args.data.diskIopsReadRateMax
+                                        });
+                                    }if (args.data.diskIopsReadRateMaxLength != null && args.data.diskIopsReadRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            iopsreadratemaxlength: args.data.diskIopsReadRateMaxLength
+                                        });
                                     }
 
                                     if (args.data.diskIopsWriteRate != null && args.data.diskIopsWriteRate.length > 0) {
                                         $.extend(data, {
                                             iopswriterate: args.data.diskIopsWriteRate
+                                        });
+                                    }if (args.data.diskIopsWriteRateMax != null && args.data.diskIopsWriteRateMax.length > 0) {
+                                        $.extend(data, {
+                                            iopswriteratemax: args.data.diskIopsWriteRateMax
+                                        });
+                                    }if (args.data.diskIopsWriteRateMaxLength != null && args.data.diskIopsWriteRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            iopswriteratemaxlength: args.data.diskIopsWriteRateMaxLength
                                         });
                                     }
                                 }
@@ -912,15 +1040,31 @@
                                     },
                                     diskBytesReadRate: {
                                         label: 'label.disk.bytes.read.rate'
+                                    },diskBytesReadRateMax: {
+                                        label: 'label.disk.bytes.read.rate.max'
+                                    },diskBytesReadRateMaxLength: {
+                                        label: 'label.disk.bytes.read.rate.max.length'
                                     },
                                     diskBytesWriteRate: {
                                         label: 'label.disk.bytes.write.rate'
+                                    },diskBytesWriteRateMax: {
+                                        label: 'label.disk.bytes.write.rate.max'
+                                    },diskBytesWriteRateMaxLength: {
+                                        label: 'label.disk.bytes.write.rate.max.length'
                                     },
                                     diskIopsReadRate: {
                                         label: 'label.disk.iops.read.rate'
+                                    },diskIopsReadRateMax: {
+                                        label: 'label.disk.iops.read.rate.max'
+                                    },diskIopsReadRateMaxLength: {
+                                        label: 'label.disk.iops.read.rate.max.length'
                                     },
                                     diskIopsWriteRate: {
                                         label: 'label.disk.iops.write.rate'
+                                    },diskIopsWriteRateMax: {
+                                        label: 'label.disk.iops.write.rate.max'
+                                    },diskIopsWriteRateMaxLength: {
+                                        label: 'label.disk.iops.write.rate.max.length'
                                     },
                                     offerha: {
                                         label: 'label.offer.ha',
@@ -1818,17 +1962,33 @@
                                                 var $maxIops = $form.find('.form-item[rel=maxIops]');
                                                 var $hypervisorSnapshotReserve = $form.find('.form-item[rel=hypervisorSnapshotReserve]');
                                                 var $diskBytesReadRate = $form.find('.form-item[rel=diskBytesReadRate]');
+                                                var $diskBytesReadRateMax = $form.find('.form-item[rel=diskBytesReadRateMax]');
+                                                var $diskBytesReadRateMaxLength = $form.find('.form-item[rel=diskBytesReadRateMaxLength]');
                                                 var $diskBytesWriteRate = $form.find('.form-item[rel=diskBytesWriteRate]');
+                                                var $diskBytesWriteRateMax = $form.find('.form-item[rel=diskBytesWriteRateMax]');
+                                                var $diskBytesWriteRateMaxLength = $form.find('.form-item[rel=diskBytesWriteRateMaxLength]');
                                                 var $diskIopsReadRate = $form.find('.form-item[rel=diskIopsReadRate]');
+                                                var $diskIopsReadRateMax = $form.find('.form-item[rel=diskIopsReadRateMax]');
+                                                var $diskIopsReadRateMaxLength = $form.find('.form-item[rel=diskIopsReadRateMaxLength]');
                                                 var $diskIopsWriteRate = $form.find('.form-item[rel=diskIopsWriteRate]');
+                                                var $diskIopsWriteRateMax = $form.find('.form-item[rel=diskIopsWriteRateMax]');
+                                                var $diskIopsWriteRateMaxLength = $form.find('.form-item[rel=diskIopsWriteRateMaxLength]');
 
                                                 var qosId = $(this).val();
 
                                                 if (qosId == 'storage') { // Storage QoS
                                                     $diskBytesReadRate.hide();
+                                                    $diskBytesReadRateMax.hide();
+                                                    $diskBytesReadRateMaxLength.hide();
                                                     $diskBytesWriteRate.hide();
+                                                    $diskBytesWriteRateMax.hide();
+                                                    $diskBytesWriteRateMaxLength.hide();
                                                     $diskIopsReadRate.hide();
+                                                    $diskIopsReadRateMax.hide();
+                                                    $diskIopsReadRateMaxLength.hide();
                                                     $diskIopsWriteRate.hide();
+                                                    $diskIopsWriteRateMax.hide();
+                                                    $diskIopsWriteRateMaxLength.hide();
 
                                                     $isCustomizedIops.css('display', 'inline-block');
 
@@ -1848,14 +2008,30 @@
                                                     $hypervisorSnapshotReserve.hide();
 
                                                     $diskBytesReadRate.css('display', 'inline-block');
+                                                    $diskBytesReadRateMax.css('display', 'inline-block');
+                                                    $diskBytesReadRateMaxLength.css('display', 'inline-block');
                                                     $diskBytesWriteRate.css('display', 'inline-block');
+                                                    $diskBytesWriteRateMax.css('display', 'inline-block');
+                                                    $diskBytesWriteRateMaxLength.css('display', 'inline-block');
                                                     $diskIopsReadRate.css('display', 'inline-block');
+                                                    $diskIopsReadRateMax.css('display', 'inline-block');
+                                                    $diskIopsReadRateMaxLength.css('display', 'inline-block');
                                                     $diskIopsWriteRate.css('display', 'inline-block');
+                                                    $diskIopsWriteRateMax.css('display', 'inline-block');
+                                                    $diskIopsWriteRateMaxLength.css('display', 'inline-block');
                                                 } else { // No Qos
                                                     $diskBytesReadRate.hide();
+                                                    $diskBytesReadRateMax.hide();
+                                                    $diskBytesReadRateMaxLength.hide();
                                                     $diskBytesWriteRate.hide();
+                                                    $diskBytesWriteRateMax.hide();
+                                                    $diskBytesWriteRateMaxLength.hide();
                                                     $diskIopsReadRate.hide();
+                                                    $diskIopsReadRateMax.hide();
+                                                    $diskIopsReadRateMaxLength.hide();
                                                     $diskIopsWriteRate.hide();
+                                                    $diskIopsWriteRateMax.hide();
+                                                    $diskIopsWriteRateMaxLength.hide();
                                                     $isCustomizedIops.hide();
                                                     $minIops.hide();
                                                     $maxIops.hide();
@@ -1904,10 +2080,38 @@
                                             required: false, //optional
                                             number: true
                                         }
+                                    },diskBytesReadRateMax: {
+                                        label: 'label.disk.bytes.read.rate.max',
+                                        docID: 'helpDiskOfferingDiskBytesReadRateMax',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },diskBytesReadRateMaxLength: {
+                                        label: 'label.disk.bytes.read.rate.max.length',
+                                        docID: 'helpDiskOfferingDiskBytesReadRateMaxLength',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
                                     },
                                     diskBytesWriteRate: {
                                         label: 'label.disk.bytes.write.rate',
                                         docID: 'helpDiskOfferingDiskBytesWriteRate',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },diskBytesWriteRateMax: {
+                                        label: 'label.disk.bytes.write.rate.max',
+                                        docID: 'helpDiskOfferingDiskBytesWriteRateMax',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },diskBytesWriteRateMaxLength: {
+                                        label: 'label.disk.bytes.write.rate.max.length',
+                                        docID: 'helpDiskOfferingDiskBytesWriteRateMaxLength',
                                         validation: {
                                             required: false, //optional
                                             number: true
@@ -1920,10 +2124,38 @@
                                             required: false, //optional
                                             number: true
                                         }
+                                    },diskIopsReadRateMax: {
+                                        label: 'label.disk.iops.read.rate.max',
+                                        docID: 'helpDiskOfferingDiskIopsReadRateMax',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },diskIopsReadRateMaxLength: {
+                                        label: 'label.disk.iops.read.rate.max.length',
+                                        docID: 'helpDiskOfferingDiskIopsReadRateMaxLength',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
                                     },
                                     diskIopsWriteRate: {
                                         label: 'label.disk.iops.write.rate',
                                         docID: 'helpDiskOfferingDiskIopsWriteRate',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },diskIopsWriteRateMax: {
+                                        label: 'label.disk.iops.write.rate.max',
+                                        docID: 'helpDiskOfferingDiskIopsWriteRateMax',
+                                        validation: {
+                                            required: false, //optional
+                                            number: true
+                                        }
+                                    },diskIopsWriteRateMaxLength: {
+                                        label: 'label.disk.iops.write.rate.max.length',
+                                        docID: 'helpDiskOfferingDiskIopsWriteRateMaxLength',
                                         validation: {
                                             required: false, //optional
                                             number: true
@@ -2078,11 +2310,27 @@
                                         $.extend(data, {
                                             bytesreadrate: args.data.diskBytesReadRate
                                         });
+                                    }if (args.data.diskBytesReadRateMax != null && args.data.diskBytesReadRateMax.length > 0) {
+                                        $.extend(data, {
+                                            bytesreadratemax: args.data.diskBytesReadRateMax
+                                        });
+                                    }if (args.data.diskBytesReadRateMaxLength != null && args.data.diskBytesReadRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            bytesreadratemaxlength: args.data.diskBytesReadRateMaxLength
+                                        });
                                     }
 
                                     if (args.data.diskBytesWriteRate != null && args.data.diskBytesWriteRate.length > 0) {
                                         $.extend(data, {
                                             byteswriterate: args.data.diskBytesWriteRate
+                                        });
+                                    }if (args.data.diskBytesWriteRateMax != null && args.data.diskBytesWriteRateMax.length > 0) {
+                                        $.extend(data, {
+                                            byteswriteratemax: args.data.diskBytesWriteRateMax
+                                        });
+                                    }if (args.data.diskBytesWriteRateMaxLength != null && args.data.diskBytesWriteRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            byteswriteratemaxlength: args.data.diskBytesWriteRateMaxLength
                                         });
                                     }
 
@@ -2090,11 +2338,27 @@
                                         $.extend(data, {
                                             iopsreadrate: args.data.diskIopsReadRate
                                         });
+                                    }if (args.data.diskIopsReadRateMax != null && args.data.diskIopsReadRateMax.length > 0) {
+                                        $.extend(data, {
+                                            iopsreadratemax: args.data.diskIopsReadRateMax
+                                        });
+                                    }if (args.data.diskIopsReadRateMaxLength != null && args.data.diskIopsReadRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            iopsreadratemaxlength: args.data.diskIopsReadRateMaxLength
+                                        });
                                     }
 
                                     if (args.data.diskIopsWriteRate != null && args.data.diskIopsWriteRate.length > 0) {
                                         $.extend(data, {
                                             iopswriterate: args.data.diskIopsWriteRate
+                                        });
+                                    }if (args.data.diskIopsWriteRateMax != null && args.data.diskIopsWriteRateMax.length > 0) {
+                                        $.extend(data, {
+                                            iopswriteratemax: args.data.diskIopsWriteRateMax
+                                        });
+                                    }if (args.data.diskIopsWriteRateMaxLength != null && args.data.diskIopsWriteRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            iopswriteratemaxlength: args.data.diskIopsWriteRateMaxLength
                                         });
                                     }
                                 }
@@ -2263,15 +2527,31 @@
                                     },
                                     diskBytesReadRate: {
                                         label: 'label.disk.bytes.read.rate'
+                                    },diskBytesReadRateMax: {
+                                        label: 'label.disk.bytes.read.rate.max'
+                                    },diskBytesReadRateMaxLength: {
+                                        label: 'label.disk.bytes.read.rate.max.length'
                                     },
                                     diskBytesWriteRate: {
                                         label: 'label.disk.bytes.write.rate'
+                                    },diskBytesWriteRateMax: {
+                                        label: 'label.disk.bytes.write.rate.max'
+                                    },diskBytesWriteRateMaxLength: {
+                                        label: 'label.disk.bytes.write.rate.max.length'
                                     },
                                     diskIopsReadRate: {
                                         label: 'label.disk.iops.read.rate'
+                                    },diskIopsReadRateMax: {
+                                        label: 'label.disk.iops.read.rate.max'
+                                    },diskIopsReadRateMaxLength: {
+                                        label: 'label.disk.iops.read.rate.max.length'
                                     },
                                     diskIopsWriteRate: {
                                         label: 'label.disk.iops.write.rate'
+                                    },diskIopsWriteRateMax: {
+                                        label: 'label.disk.iops.write.rate.max'
+                                    },diskIopsWriteRateMaxLength: {
+                                        label: 'label.disk.iops.write.rate.max.length'
                                     },
                                     cacheMode: {
                                         label: 'label.cache.mode'
