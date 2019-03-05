@@ -2526,19 +2526,84 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             return _serviceOfferingDao.findById(id);
         }
 
-        ServiceOfferingVO offering = _serviceOfferingDao.createForUpdate(id);
+        final Long diskBytesReadRate = cmd.getDiskBytesReadRate();
+        final Long diskBytesReadRateMax = cmd.getDiskBytesReadRateMax();
+        final Long diskBytesReadRateMaxLength = cmd.getDiskBytesReadRateMaxLength();
+        final Long diskBytesWriteRate = cmd.getDiskBytesWriteRate();
+        final Long diskBytesWriteRateMax = cmd.getDiskBytesWriteRateMax();
+        final Long diskBytesWriteRateMaxLength = cmd.getDiskBytesWriteRateMaxLength();
+        final Long diskIopsReadRate = cmd.getDiskIopsReadRate();
+        final Long diskIopsReadRateMax = cmd.getDiskIopsReadRateMax();
+        final Long diskIopsReadRateMaxLength = cmd.getDiskIopsReadRateMaxLength();
+        final Long diskIopsWriteRate = cmd.getDiskIopsWriteRate();
+        final Long diskIopsWriteRateMax = cmd.getDiskIopsWriteRateMax();
+        final Long diskIopsWriteRateMaxLength = cmd.getDiskIopsWriteRateMaxLength();
+
+        ServiceOfferingVO diskOffering = _serviceOfferingDao.createForUpdate(id);
 
         if (name != null) {
-            offering.setName(name);
+            diskOffering.setName(name);
         }
 
         if (displayText != null) {
-            offering.setDisplayText(displayText);
+            diskOffering.setDisplayText(displayText);
         }
 
         if (sortKey != null) {
-            offering.setSortKey(sortKey);
+            diskOffering.setSortKey(sortKey);
         }
+        // BPS Read Rate
+        if (diskBytesReadRate != null && diskBytesReadRate < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setBytesReadRate(diskBytesReadRate);
+        if (diskBytesReadRateMax != null && diskBytesReadRateMax < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setBytesReadRateMax(diskBytesReadRateMax);
+        if (diskBytesReadRateMaxLength != null && diskBytesReadRateMaxLength < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setBytesReadRateMaxLength(diskBytesReadRateMaxLength);
+        // BPS Write Rate
+        if (diskBytesWriteRate != null && diskBytesWriteRate < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setBytesWriteRate(diskBytesWriteRate);
+        if (diskBytesWriteRateMax != null && diskBytesWriteRateMax < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setBytesWriteRateMax(diskBytesWriteRateMax);
+        if (diskBytesWriteRateMaxLength != null && diskBytesWriteRateMaxLength < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setBytesWriteRateMaxLength(diskBytesWriteRateMaxLength);
+        // IOPS Read Rate
+        if (diskIopsReadRate != null && diskIopsReadRate < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setIopsReadRate(diskIopsReadRate);
+        if (diskIopsReadRateMax != null && diskIopsReadRateMax < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setIopsReadRateMax(diskIopsReadRateMax);
+        if (diskIopsReadRateMaxLength != null && diskIopsReadRateMaxLength < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setIopsReadRateMaxLength(diskIopsReadRateMaxLength);
+        // IOPS Write Rate
+        if (diskIopsWriteRate != null && diskIopsWriteRate < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setIopsWriteRate(diskIopsWriteRate);
+        if (diskIopsWriteRateMax != null && diskIopsWriteRateMax < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setIopsWriteRateMax(diskIopsWriteRateMax);
+        if (diskIopsWriteRateMaxLength != null && diskIopsWriteRateMaxLength < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setIopsWriteRateMaxLength(diskIopsWriteRateMaxLength);
 
         // Note: tag editing commented out for now; keeping the code intact,
         // might need to re-enable in next releases
@@ -2564,10 +2629,10 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         // }
         // }
 
-        if (_serviceOfferingDao.update(id, offering)) {
-            offering = _serviceOfferingDao.findById(id);
-            CallContext.current().setEventDetails("Service offering id=" + offering.getId());
-            return offering;
+        if (_serviceOfferingDao.update(id, diskOffering)) {
+            diskOffering = _serviceOfferingDao.findById(id);
+            CallContext.current().setEventDetails("Service offering id=" + diskOffering.getId());
+            return diskOffering;
         } else {
             return null;
         }
@@ -2801,6 +2866,19 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             return _diskOfferingDao.findById(diskOfferingId);
         }
 
+        final Long diskBytesReadRate = cmd.getDiskBytesReadRate();
+        final Long diskBytesReadRateMax = cmd.getDiskBytesReadRateMax();
+        final Long diskBytesReadRateMaxLength = cmd.getDiskBytesReadRateMaxLength();
+        final Long diskBytesWriteRate = cmd.getDiskBytesWriteRate();
+        final Long diskBytesWriteRateMax = cmd.getDiskBytesWriteRateMax();
+        final Long diskBytesWriteRateMaxLength = cmd.getDiskBytesWriteRateMaxLength();
+        final Long diskIopsReadRate = cmd.getDiskIopsReadRate();
+        final Long diskIopsReadRateMax = cmd.getDiskIopsReadRateMax();
+        final Long diskIopsReadRateMaxLength = cmd.getDiskIopsReadRateMaxLength();
+        final Long diskIopsWriteRate = cmd.getDiskIopsWriteRate();
+        final Long diskIopsWriteRateMax = cmd.getDiskIopsWriteRateMax();
+        final Long diskIopsWriteRateMaxLength = cmd.getDiskIopsWriteRateMaxLength();
+
         final DiskOfferingVO diskOffering = _diskOfferingDao.createForUpdate(diskOfferingId);
 
         if (name != null) {
@@ -2818,6 +2896,58 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         if (displayDiskOffering != null) {
             diskOffering.setDisplayOffering(displayDiskOffering);
         }
+        // BPS Read Rate
+        if (diskBytesReadRate != null && diskBytesReadRate < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setBytesReadRate(diskBytesReadRate);
+        if (diskBytesReadRateMax != null && diskBytesReadRateMax < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setBytesReadRateMax(diskBytesReadRateMax);
+        if (diskBytesReadRateMaxLength != null && diskBytesReadRateMaxLength < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setBytesReadRateMaxLength(diskBytesReadRateMaxLength);
+        // BPS Write Rate
+        if (diskBytesWriteRate != null && diskBytesWriteRate < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setBytesWriteRate(diskBytesWriteRate);
+        if (diskBytesWriteRateMax != null && diskBytesWriteRateMax < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setBytesWriteRateMax(diskBytesWriteRateMax);
+        if (diskBytesWriteRateMaxLength != null && diskBytesWriteRateMaxLength < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setBytesWriteRateMaxLength(diskBytesWriteRateMaxLength);
+        // IOPS Read Rate
+        if (diskIopsReadRate != null && diskIopsReadRate < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setIopsReadRate(diskIopsReadRate);
+        if (diskIopsReadRateMax != null && diskIopsReadRateMax < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setIopsReadRateMax(diskIopsReadRateMax);
+        if (diskIopsReadRateMaxLength != null && diskIopsReadRateMaxLength < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setIopsReadRateMaxLength(diskIopsReadRateMaxLength);
+        // IOPS Write Rate
+        if (diskIopsWriteRate != null && diskIopsWriteRate < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setIopsWriteRate(diskIopsWriteRate);
+        if (diskIopsWriteRateMax != null && diskIopsWriteRateMax < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setIopsWriteRateMax(diskIopsWriteRateMax);
+        if (diskIopsWriteRateMaxLength != null && diskIopsWriteRateMaxLength < 0) {
+            throw new InvalidParameterValueException("Negative values are not allowed for disk read/write parameters.");
+        }
+        diskOffering.setIopsWriteRateMaxLength(diskIopsWriteRateMaxLength);
 
         // Note: tag editing commented out for now;keeping the code intact,
         // might need to re-enable in next releases
