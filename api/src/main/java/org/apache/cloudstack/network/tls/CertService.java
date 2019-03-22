@@ -16,6 +16,8 @@
 // under the License.
 package org.apache.cloudstack.network.tls;
 
+import java.io.IOException;
+import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.List;
 
@@ -26,11 +28,15 @@ import org.apache.cloudstack.api.response.SslCertResponse;
 
 public interface CertService {
 
-    public SslCertResponse uploadSslCert(UploadSslCertCmd certCmd);
+    SslCertResponse uploadSslCert(UploadSslCertCmd certCmd);
 
-    public void deleteSslCert(DeleteSslCertCmd deleteSslCertCmd);
+    void deleteSslCert(DeleteSslCertCmd deleteSslCertCmd);
 
-    public List<SslCertResponse> listSslCerts(ListSslCertsCmd listSslCertCmd);
+    List<SslCertResponse> listSslCerts(ListSslCertsCmd listSslCertCmd);
 
-    public Certificate parseCertificate(final String cert);
+    Certificate parseCertificate(final String cert);
+
+    void validateChain(final List<Certificate> chain, final Certificate cert);
+
+    PrivateKey parsePrivateKey(final String key) throws IOException;
 }

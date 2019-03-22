@@ -47,6 +47,9 @@ public class ApiConstants {
     public static final String CAN_REVERT = "canrevert";
     public static final String CA_CERTIFICATES = "cacertificates";
     public static final String CERTIFICATE = "certificate";
+    public static final String ROOT_CERTIFICATE = "rootcertificate";
+    public static final String INTERMIDIATE_CERTIFICATES = "intermediatecertificates";
+    public static final String SERVER_CERTIFICATE = "servercertificate";
     public static final String CERTIFICATE_CHAIN = "certchain";
     public static final String CERTIFICATE_FINGERPRINT = "fingerprint";
     public static final String CERTIFICATE_ID = "certid";
@@ -712,7 +715,8 @@ public class ApiConstants {
             + " and just a plain ascii/utf8 representation of a hexadecimal string. If it is required to\n"
             + " use another algorithm the hexadecimal string is to be prefixed with a string of the form,\n"
             + " \"{<algorithm>}\", not including the double quotes. In this <algorithm> is the exact string\n"
-            + " representing the java supported algorithm, i.e. MD5 or SHA-256. Note that java does not\n" + " contain an algorithm called SHA256 or one called sha-256, only SHA-256.";
+            + " representing the java supported algorithm, i.e. MD5 or SHA-256. Note that java does not\n"
+            + " contain an algorithm called SHA256 or one called sha-256, only SHA-256.";
 
     public static final String HAS_ANNOTATION = "hasannotation";
     public static final String LAST_ANNOTATED = "lastannotated";

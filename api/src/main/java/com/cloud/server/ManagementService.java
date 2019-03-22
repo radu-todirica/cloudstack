@@ -16,6 +16,9 @@
 // under the License.
 package com.cloud.server;
 
+import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +40,7 @@ import org.apache.cloudstack.api.command.admin.resource.DeleteAlertsCmd;
 import org.apache.cloudstack.api.command.admin.resource.ListAlertsCmd;
 import org.apache.cloudstack.api.command.admin.resource.ListCapacityCmd;
 import org.apache.cloudstack.api.command.admin.resource.UploadCustomCertificateCmd;
+import org.apache.cloudstack.api.command.admin.resource.UploadCustomCertificateWithValidationCmd;
 import org.apache.cloudstack.api.command.admin.systemvm.DestroySystemVmCmd;
 import org.apache.cloudstack.api.command.admin.systemvm.ListSystemVMsCmd;
 import org.apache.cloudstack.api.command.admin.systemvm.RebootSystemVmCmd;
@@ -314,6 +318,15 @@ public interface ManagementService {
      */
     String uploadCertificate(UploadCustomCertificateCmd cmd);
 
+    /**
+     * This method uploads a custom cert to the db and performs the proper validations on it, and patches every cpvm with it on the current ms
+     *
+     * @param cmd
+     *            -- upload certificate cmd
+     * @return -- returns a string on success
+     */
+    String uploadCertificateWithValidation(UploadCustomCertificateWithValidationCmd cmd) throws KeyStoreException, CertificateException, IOException;
+
     String getVersion();
 
     /**
@@ -404,8 +417,7 @@ public interface ManagementService {
 
     String[] listEventTypes();
 
-    Pair<List<? extends HypervisorCapabilities>, Integer> listHypervisorCapabilities(Long id, HypervisorType hypervisorType, String keyword, Long startIndex,
-            Long pageSizeVal);
+    Pair<List<? extends HypervisorCapabilities>, Integer> listHypervisorCapabilities(Long id, HypervisorType hypervisorType, String keyword, Long startIndex, Long pageSizeVal);
 
     HypervisorCapabilities updateHypervisorCapabilities(Long id, Long maxGuestsLimit, Boolean securityGroupEnabled);
 
@@ -419,10 +431,9 @@ public interface ManagementService {
 
     List<String> listDeploymentPlanners();
 
-    VirtualMachine upgradeSystemVM(ScaleSystemVMCmd cmd) throws ResourceUnavailableException, ManagementServerException, VirtualMachineMigrationException,
-    ConcurrentOperationException;
+    VirtualMachine upgradeSystemVM(ScaleSystemVMCmd cmd)
+            throws ResourceUnavailableException, ManagementServerException, VirtualMachineMigrationException, ConcurrentOperationException;
 
     void cleanupVMReservations();
-
 
 }

@@ -307,8 +307,7 @@ public class CertServiceImpl implements CertService {
         if (account.getType() == Account.ACCOUNT_TYPE_PROJECT) {
             // find the project
             final Project project = _projectMgr.findByProjectAccountIdIncludingRemoved(account.getId());
-            if (project != null)
-            {
+            if (project != null) {
                 response.setProjectId(project.getUuid());
                 response.setProjectName(project.getName());
             } else {
@@ -388,7 +387,7 @@ public class CertServiceImpl implements CertService {
         }
     }
 
-    private void validateChain(final List<Certificate> chain, final Certificate cert) {
+    public void validateChain(final List<Certificate> chain, final Certificate cert) {
 
         final List<Certificate> certs = new ArrayList<Certificate>();
         final Set<TrustAnchor> anchors = new HashSet<TrustAnchor>();

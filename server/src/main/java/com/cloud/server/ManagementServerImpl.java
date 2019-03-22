@@ -16,7 +16,18 @@
 // under the License.
 package com.cloud.server;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Field;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -37,7 +48,6 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 
-import com.cloud.storage.ScopeType;
 import org.apache.cloudstack.acl.ControlledEntity;
 import org.apache.cloudstack.affinity.AffinityGroupProcessor;
 import org.apache.cloudstack.affinity.dao.AffinityGroupVMMapDao;
@@ -167,6 +177,7 @@ import org.apache.cloudstack.api.command.admin.resource.DeleteAlertsCmd;
 import org.apache.cloudstack.api.command.admin.resource.ListAlertsCmd;
 import org.apache.cloudstack.api.command.admin.resource.ListCapacityCmd;
 import org.apache.cloudstack.api.command.admin.resource.UploadCustomCertificateCmd;
+import org.apache.cloudstack.api.command.admin.resource.UploadCustomCertificateWithValidationCmd;
 import org.apache.cloudstack.api.command.admin.router.ConfigureOvsElementCmd;
 import org.apache.cloudstack.api.command.admin.router.ConfigureVirtualRouterElementCmd;
 import org.apache.cloudstack.api.command.admin.router.CreateVirtualRouterElementCmd;
@@ -531,6 +542,7 @@ import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.config.impl.ConfigurationVO;
 import org.apache.cloudstack.framework.security.keystore.KeystoreManager;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
+import org.apache.cloudstack.network.tls.CertService;
 import org.apache.cloudstack.resourcedetail.dao.GuestOsDetailsDao;
 import org.apache.cloudstack.storage.datastore.db.ImageStoreDao;
 import org.apache.cloudstack.storage.datastore.db.ImageStoreVO;
@@ -541,6 +553,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemReader;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.GetVncPortAnswer;
@@ -634,6 +648,7 @@ import com.cloud.storage.GuestOSHypervisor;
 import com.cloud.storage.GuestOSHypervisorVO;
 import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.GuestOsCategory;
+import com.cloud.storage.ScopeType;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.StoragePool;
 import com.cloud.storage.Volume;
@@ -673,6 +688,7 @@ import com.cloud.utils.db.JoinBuilder.JoinType;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.Transaction;
+import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.CloudRuntimeException;
@@ -696,12 +712,19 @@ import com.cloud.vm.dao.InstanceGroupDao;
 import com.cloud.vm.dao.SecondaryStorageVmDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
+import com.google.common.base.Preconditions;
 
 public class ManagementServerImpl extends ManagerBase implements ManagementServer, Configurable {
     public static final Logger s_logger = Logger.getLogger(ManagementServerImpl.class.getName());
 
-    static final ConfigKey<Integer> vmPasswordLength = new ConfigKey<Integer>("Advanced", Integer.class, "vm.password.length", "6", "Specifies the length of a randomly generated password", false);
-    static final ConfigKey<Integer> sshKeyLength = new ConfigKey<Integer>("Advanced", Integer.class, "ssh.key.length", "2048", "Specifies custom SSH key length (bit)", true, ConfigKey.Scope.Global);
+    static final ConfigKey<Integer> vmPasswordLength = new ConfigKey<Integer>("Advanced", Integer.class, "vm.password.length", "6",
+            "Specifies the length of a randomly generated password", false);
+    static final ConfigKey<Integer> sshKeyLength = new ConfigKey<Integer>("Advanced", Integer.class, "ssh.key.length", "2048", "Specifies custom SSH key length (bit)", true,
+            ConfigKey.Scope.Global);
+    public static final String ROOT_NAME = "root";
+    public static final String INTERMEDIATE_NAME = "intermediate";
+    public static final String SERVER_NAME = "server";
+
     @Inject
     public AccountManager _accountMgr;
     @Inject
@@ -810,6 +833,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
     private GuestOsDetailsDao _guestOsDetailsDao;
     @Inject
     private KeystoreManager _ksMgr;
+    @Inject
+    private CertService _certService;
 
     private LockMasterListener _lockMasterListener;
     private final ScheduledExecutorService _eventExecutor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("EventChecker"));
@@ -1145,14 +1170,14 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         final Object resourceState = cmd.getResourceState();
         final Object haHosts = cmd.getHaHost();
 
-        final Pair<List<HostVO>, Integer> result = searchForServers(cmd.getStartIndex(), cmd.getPageSizeVal(), name, type, state, zoneId, pod, cluster, id, keyword, resourceState, haHosts, null,
-                null);
+        final Pair<List<HostVO>, Integer> result = searchForServers(cmd.getStartIndex(), cmd.getPageSizeVal(), name, type, state, zoneId, pod, cluster, id, keyword, resourceState,
+                haHosts, null, null);
         return new Pair<List<? extends Host>, Integer>(result.first(), result.second());
     }
 
     @Override
-    public Ternary<Pair<List<? extends Host>, Integer>, List<? extends Host>, Map<Host, Boolean>> listHostsForMigrationOfVM(final Long vmId, final Long startIndex, final Long pageSize,
-            final String keyword) {
+    public Ternary<Pair<List<? extends Host>, Integer>, List<? extends Host>, Map<Host, Boolean>> listHostsForMigrationOfVM(final Long vmId, final Long startIndex,
+            final Long pageSize, final String keyword) {
         final Account caller = getCaller();
         if (!_accountMgr.isRootAdmin(caller.getId())) {
             if (s_logger.isDebugEnabled()) {
@@ -1179,8 +1204,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         if (_serviceOfferingDetailsDao.findDetail(vm.getServiceOfferingId(), GPU.Keys.pciDevice.toString()) != null) {
             s_logger.info(" Live Migration of GPU enabled VM : " + vm.getInstanceName() + " is not supported");
             // Return empty list.
-            return new Ternary<Pair<List<? extends Host>, Integer>, List<? extends Host>, Map<Host, Boolean>>(new Pair<List<? extends Host>, Integer>(new ArrayList<HostVO>(), new Integer(0)),
-                    new ArrayList<Host>(), new HashMap<Host, Boolean>());
+            return new Ternary<Pair<List<? extends Host>, Integer>, List<? extends Host>, Map<Host, Boolean>>(
+                    new Pair<List<? extends Host>, Integer>(new ArrayList<HostVO>(), new Integer(0)), new ArrayList<Host>(), new HashMap<Host, Boolean>());
         }
 
         if (!vm.getHypervisorType().equals(HypervisorType.XenServer) && !vm.getHypervisorType().equals(HypervisorType.VMware) && !vm.getHypervisorType().equals(HypervisorType.KVM)
@@ -1241,8 +1266,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         final Map<Host, Boolean> requiresStorageMotion = new HashMap<Host, Boolean>();
         DataCenterDeployment plan = null;
         if (canMigrateWithStorage) {
-            allHostsPair = searchForServers(startIndex, pageSize, null, hostType, null, srcHost.getDataCenterId(), null, null, null, keyword, null, null, srcHost.getHypervisorType(),
-                    srcHost.getHypervisorVersion());
+            allHostsPair = searchForServers(startIndex, pageSize, null, hostType, null, srcHost.getDataCenterId(), null, null, null, keyword, null, null,
+                    srcHost.getHypervisorType(), srcHost.getHypervisorVersion());
             allHosts = allHostsPair.first();
             allHosts.remove(srcHost);
 
@@ -1485,8 +1510,9 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         return suitablePools;
     }
 
-    private Pair<List<HostVO>, Integer> searchForServers(final Long startIndex, final Long pageSize, final Object name, final Object type, final Object state, final Object zone, final Object pod,
-            final Object cluster, final Object id, final Object keyword, final Object resourceState, final Object haHosts, final Object hypervisorType, final Object hypervisorVersion) {
+    private Pair<List<HostVO>, Integer> searchForServers(final Long startIndex, final Long pageSize, final Object name, final Object type, final Object state, final Object zone,
+            final Object pod, final Object cluster, final Object id, final Object keyword, final Object resourceState, final Object haHosts, final Object hypervisorType,
+            final Object hypervisorVersion) {
         final Filter searchFilter = new Filter(HostVO.class, "id", Boolean.TRUE, startIndex, pageSize);
 
         final SearchBuilder<HostVO> sb = _hostDao.createSearchBuilder();
@@ -1879,9 +1905,10 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         if (isAllocated) {
             final Account caller = getCaller();
 
-            final Ternary<Long, Boolean, ListProjectResourcesCriteria> domainIdRecursiveListProject = new Ternary<Long, Boolean, ListProjectResourcesCriteria>(cmd.getDomainId(), cmd.isRecursive(),
-                    null);
-            _accountMgr.buildACLSearchParameters(caller, cmd.getId(), cmd.getAccountName(), cmd.getProjectId(), permittedAccounts, domainIdRecursiveListProject, cmd.listAll(), false);
+            final Ternary<Long, Boolean, ListProjectResourcesCriteria> domainIdRecursiveListProject = new Ternary<Long, Boolean, ListProjectResourcesCriteria>(cmd.getDomainId(),
+                    cmd.isRecursive(), null);
+            _accountMgr.buildACLSearchParameters(caller, cmd.getId(), cmd.getAccountName(), cmd.getProjectId(), permittedAccounts, domainIdRecursiveListProject, cmd.listAll(),
+                    false);
             domainId = domainIdRecursiveListProject.first();
             isRecursive = domainIdRecursiveListProject.second();
             listProjectResourcesCriteria = domainIdRecursiveListProject.third();
@@ -2136,8 +2163,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         final GuestOSHypervisorVO duplicate = _guestOSHypervisorDao.findByOsIdAndHypervisorAndUserDefined(guestOs.getId(), hypervisorType.toString(), hypervisorVersion, true);
 
         if (duplicate != null) {
-            throw new InvalidParameterValueException(
-                    "Mapping from hypervisor : " + hypervisorType.toString() + ", version : " + hypervisorVersion + " and guest OS : " + guestOs.getDisplayName() + " already exists!");
+            throw new InvalidParameterValueException("Mapping from hypervisor : " + hypervisorType.toString() + ", version : " + hypervisorVersion + " and guest OS : "
+                    + guestOs.getDisplayName() + " already exists!");
         }
         final GuestOSHypervisorVO guestOsMapping = new GuestOSHypervisorVO();
         guestOsMapping.setGuestOsId(guestOs.getId());
@@ -2313,7 +2340,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         return _consoleProxyMgr.startProxy(instanceId, true);
     }
 
-    private ConsoleProxyVO stopConsoleProxy(final VMInstanceVO systemVm, final boolean isForced) throws ResourceUnavailableException, OperationTimedoutException, ConcurrentOperationException {
+    private ConsoleProxyVO stopConsoleProxy(final VMInstanceVO systemVm, final boolean isForced)
+            throws ResourceUnavailableException, OperationTimedoutException, ConcurrentOperationException {
 
         _itMgr.advanceStop(systemVm.getUuid(), isForced);
         return _consoleProxyDao.findById(systemVm.getId());
@@ -2446,7 +2474,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
                 summedCapacities.addAll(summedCapacitiesAtPod);
             }
         } else { // Group by Cluster, capacity type
-            final List<SummedCapacity> summedCapacitiesAtCluster = _capacityDao.listCapacitiesGroupedByLevelAndType(capacityType, zoneId, podId, clusterId, 3, cmd.getPageSizeVal());
+            final List<SummedCapacity> summedCapacitiesAtCluster = _capacityDao.listCapacitiesGroupedByLevelAndType(capacityType, zoneId, podId, clusterId, 3,
+                    cmd.getPageSizeVal());
             if (summedCapacitiesAtCluster != null) {
                 summedCapacities.addAll(summedCapacitiesAtCluster);
             }
@@ -2507,8 +2536,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
                     } else {
                         capacity.setUsedPercentage(0);
                     }
-                    final SummedCapacity summedCapacity = new SummedCapacity(capacity.getUsedCapacity(), capacity.getTotalCapacity(), capacity.getUsedPercentage(), capacity.getCapacityType(),
-                            capacity.getDataCenterId(), capacity.getPodId(), capacity.getClusterId());
+                    final SummedCapacity summedCapacity = new SummedCapacity(capacity.getUsedCapacity(), capacity.getTotalCapacity(), capacity.getUsedPercentage(),
+                            capacity.getCapacityType(), capacity.getDataCenterId(), capacity.getPodId(), capacity.getClusterId());
                     list.add(summedCapacity);
                 }
             } else {
@@ -2523,8 +2552,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
                         } else {
                             capacity.setUsedPercentage(0);
                         }
-                        SummedCapacity summedCapacity = new SummedCapacity(capacity.getUsedCapacity(), capacity.getTotalCapacity(), capacity.getUsedPercentage(), capacity.getCapacityType(),
-                                capacity.getDataCenterId(), capacity.getPodId(), capacity.getClusterId());
+                        SummedCapacity summedCapacity = new SummedCapacity(capacity.getUsedCapacity(), capacity.getTotalCapacity(), capacity.getUsedPercentage(),
+                                capacity.getCapacityType(), capacity.getDataCenterId(), capacity.getPodId(), capacity.getClusterId());
                         list.add(summedCapacity);
                     }
                 }// End of for
@@ -3571,8 +3600,125 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
 
         _consoleProxyMgr.setManagementState(ConsoleProxyManagementState.ResetSuspending);
         return "Certificate has been successfully updated, if its the server certificate we would reboot all "
-        + "running console proxy VMs and secondary storage VMs to propagate the new certificate, "
-        + "please give a few minutes for console access and storage services service to be up and working again";
+                + "running console proxy VMs and secondary storage VMs to propagate the new certificate, "
+                + "please give a few minutes for console access and storage services service to be up and working again";
+    }
+
+    @Override
+    @DB
+    public String uploadCertificateWithValidation(UploadCustomCertificateWithValidationCmd cmd) throws KeyStoreException, CertificateException, IOException {
+        final String rootCertificate;
+        final Map<Integer, String> intermediateCertificates;
+        final String serverCertificate;
+        final String privateKey;
+        final String dnsSuffix;
+
+        rootCertificate = getRootCertificate(cmd);
+        intermediateCertificates = cmd.getIntermediateCertificates();
+        serverCertificate = cmd.getServerCertificate();
+        privateKey = cmd.getPrivateKey();
+        dnsSuffix = cmd.getDomainSuffix();
+
+        try {
+            return Transaction.execute(new TransactionCallback<String>() {
+                @Override
+                public String doInTransaction(TransactionStatus status) {
+
+                    if (rootCertificate == null) {
+                        throw new InvalidParameterValueException("No root certificate provided and there is no default certificate present.");
+                    }
+                    if (serverCertificate == null) {
+                        throw new InvalidParameterValueException("Server certificate cannot be empty.");
+                    }
+                    if (privateKey == null) {
+                        throw new InvalidParameterValueException("Private key cannot be empty");
+                    }
+                    if (dnsSuffix == null) {
+                        throw new InvalidParameterValueException("DNS Suffix cannot be empty");
+                    }
+
+                    try {
+                        validateCertificatesFormatAndValidity(rootCertificate, intermediateCertificates, serverCertificate);
+                        validateCertificateChainAndPrivateKey(rootCertificate, intermediateCertificates, serverCertificate, privateKey);
+                    } catch (CertificateNotYetValidException | CertificateExpiredException | IOException e) {
+                        throw new RuntimeException(e.getMessage()); //did this to stop the transaction but not hide the cause, it should be changed
+                    }
+
+                    _ksMgr.saveCertificate(ROOT_NAME, rootCertificate, privateKey, dnsSuffix);
+                    for (Map.Entry<Integer, String> intermediateCertificate : intermediateCertificates.entrySet()) {
+                        _ksMgr.saveCertificate(INTERMEDIATE_NAME + intermediateCertificate.getKey().toString(), intermediateCertificate.getValue(), privateKey, dnsSuffix);
+                    }
+                    _ksMgr.saveCertificate(SERVER_NAME, rootCertificate, privateKey, dnsSuffix);
+
+                    final List<SecondaryStorageVmVO> alreadyRunning = _secStorageVmDao.getSecStorageVmListInStates(null, State.Running, State.Migrating, State.Starting);
+                    for (final SecondaryStorageVmVO ssVmVm : alreadyRunning) {
+                        _secStorageVmMgr.rebootSecStorageVm(ssVmVm.getId());
+                    }
+
+                    return "Certificate has been successfully updated, we will reboot all "
+                            + "running console proxy VMs and secondary storage VMs to propagate the new certificate, "
+                            + "please give a few minutes for console access and storage services service to be up and working again";
+                }
+            });
+        } catch (Exception e) {
+            return "Certificate upload failed!";
+        }
+    }
+
+    private String getRootCertificate(UploadCustomCertificateWithValidationCmd cmd) throws KeyStoreException {
+        String rootCertificate;
+        if (cmd.getRootCertificate() == null) {
+            rootCertificate = getExistingCertificateFromKeystore();
+        } else {
+            rootCertificate = cmd.getRootCertificate();
+        }
+        return rootCertificate;
+    }
+
+    private String getExistingCertificateFromKeystore() throws KeyStoreException {
+        KeyStore ks = KeyStore.getInstance("JKS");
+        Certificate existingCertificate = ks.getCertificate("root");
+        return existingCertificate.toString();
+    }
+
+    private void validateCertificatesFormatAndValidity(String rootCertificate, Map<Integer, String> intermediateCertificates, String serverCertificate)
+            throws CertificateNotYetValidException, CertificateExpiredException {
+        validateCertificateFormatAndValidity(rootCertificate);
+        for (String intermediateCertificate : intermediateCertificates.values()) {
+            validateCertificateFormatAndValidity(intermediateCertificate);
+        }
+        validateCertificateFormatAndValidity(serverCertificate);
+    }
+
+    private void validateCertificateFormatAndValidity(String certificateInputToValidate) throws CertificateNotYetValidException, CertificateExpiredException {
+        final Certificate certificate = _certService.parseCertificate(certificateInputToValidate);
+        Preconditions.checkNotNull(certificate);
+        if (!(certificate instanceof X509Certificate)) {
+            throw new IllegalArgumentException("Invalid certificate format. Expected X509 certificate");
+        }
+        ((X509Certificate)certificate).checkValidity();
+    }
+
+    private void validateCertificateChainAndPrivateKey(String rootCertificate, Map<Integer, String> intermediateCertificates, String serverCertificate, String privateKey)
+            throws IOException {
+        List<Certificate> certificateChain = new ArrayList<>();
+        for (String intermediateCertificate : intermediateCertificates.values()) {
+            certificateChain.add(generateCertificateFromString(intermediateCertificate));
+        }
+        certificateChain.add(generateCertificateFromString(serverCertificate));
+        _certService.parsePrivateKey(privateKey);
+        _certService.validateChain(certificateChain, generateCertificateFromString(rootCertificate));
+    }
+
+    private Certificate generateCertificateFromString(String intermediateCertificate) {
+        try (final PemReader pemReader = new PemReader(new StringReader(intermediateCertificate))) {
+            PemObject pemObject = pemReader.readPemObject();
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(pemObject.getContent());
+            return certificateFactory.generateCertificate(inputStream);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override
@@ -3678,7 +3824,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         final Account caller = getCaller();
         final List<Long> permittedAccounts = new ArrayList<Long>();
 
-        final Ternary<Long, Boolean, ListProjectResourcesCriteria> domainIdRecursiveListProject = new Ternary<Long, Boolean, ListProjectResourcesCriteria>(cmd.getDomainId(), cmd.isRecursive(), null);
+        final Ternary<Long, Boolean, ListProjectResourcesCriteria> domainIdRecursiveListProject = new Ternary<Long, Boolean, ListProjectResourcesCriteria>(cmd.getDomainId(),
+                cmd.isRecursive(), null);
         _accountMgr.buildACLSearchParameters(caller, null, cmd.getAccountName(), cmd.getProjectId(), permittedAccounts, domainIdRecursiveListProject, cmd.listAll(), false);
         final Long domainId = domainIdRecursiveListProject.first();
         final Boolean isRecursive = domainIdRecursiveListProject.second();
@@ -3821,8 +3968,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         _userVmDao.loadDetails(vm);
         final String password = vm.getDetail("Encrypted.Password");
         if (password == null || password.equals("")) {
-            final InvalidParameterValueException ex = new InvalidParameterValueException(
-                    "No password for VM with specified id found. " + "If VM is created from password enabled template and SSH keypair is assigned to VM then only password can be retrieved.");
+            final InvalidParameterValueException ex = new InvalidParameterValueException("No password for VM with specified id found. "
+                    + "If VM is created from password enabled template and SSH keypair is assigned to VM then only password can be retrieved.");
             ex.addProxyObject(vm.getUuid(), "vmId");
             throw ex;
         }
@@ -3934,8 +4081,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
     }
 
     @Override
-    public Pair<List<? extends HypervisorCapabilities>, Integer> listHypervisorCapabilities(final Long id, final HypervisorType hypervisorType, final String keyword, final Long startIndex,
-            final Long pageSizeVal) {
+    public Pair<List<? extends HypervisorCapabilities>, Integer> listHypervisorCapabilities(final Long id, final HypervisorType hypervisorType, final String keyword,
+            final Long startIndex, final Long pageSizeVal) {
         final Filter searchFilter = new Filter(HypervisorCapabilitiesVO.class, "id", true, startIndex, pageSizeVal);
         final SearchCriteria<HypervisorCapabilitiesVO> sc = _hypervisorCapabilitiesDao.createSearchCriteria();
 
@@ -3993,7 +4140,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VM_UPGRADE, eventDescription = "Upgrading system VM", async = true)
-    public VirtualMachine upgradeSystemVM(final ScaleSystemVMCmd cmd) throws ResourceUnavailableException, ManagementServerException, VirtualMachineMigrationException, ConcurrentOperationException {
+    public VirtualMachine upgradeSystemVM(final ScaleSystemVMCmd cmd)
+            throws ResourceUnavailableException, ManagementServerException, VirtualMachineMigrationException, ConcurrentOperationException {
 
         final VMInstanceVO vmInstance = _vmInstanceDao.findById(cmd.getId());
         if (vmInstance.getHypervisorType() == HypervisorType.XenServer && vmInstance.getState().equals(State.Running)) {
