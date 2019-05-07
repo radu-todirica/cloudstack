@@ -3043,7 +3043,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     private DiskDef.DiskBus getGuestDiskModel(final String platformEmulator) {
         if (platformEmulator == null) {
             return DiskDef.DiskBus.IDE;
-        } else if (platformEmulator.startsWith("Other PV Virtio-SCSI")) {
+        } else if (platformEmulator.startsWith("Other PV Virtio-SCSI")  || platformEmulator.startsWith("Windows PV Virtio-SCSI") ) {
             return DiskDef.DiskBus.SCSI;
         } else if (platformEmulator.startsWith("Ubuntu") || platformEmulator.startsWith("Fedora 13") || platformEmulator.startsWith("Fedora 12") || platformEmulator.startsWith("Fedora 11") ||
                 platformEmulator.startsWith("Fedora 10") || platformEmulator.startsWith("Fedora 9") || platformEmulator.startsWith("CentOS 5.3") || platformEmulator.startsWith("CentOS 5.4") ||
