@@ -1880,17 +1880,35 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         return uuid;
     }
 
-    protected void enlightenWindowsVm(VirtualMachineTO vmTO, FeaturesDef features) {
+    protected void enlightenWindowsVmFromOS(final VirtualMachineTO vmTO, final FeaturesDef features) {
     // If OS is Windows PV, then enable the features. Features supported on Windows 2008 and later
         if (vmTO.getOs().contains("Windows PV")) {
-            LibvirtVMDef.HyperVEnlightenmentFeatureDef hyv = new LibvirtVMDef.HyperVEnlightenmentFeatureDef();
-            hyv.setFeature("relaxed", true);
-            hyv.setFeature("vapic", true);
-            hyv.setFeature("spinlocks", true);
-            hyv.setRetries(8096);
-            features.addHyperVFeature(hyv);
-            s_logger.info("Enabling KVM Enlightment Features to VM domain " + vmTO.getUuid());
+            enlightenWindowsVmEnable(vmTO, features);
+            s_logger.info("Enabling KVM Enlightment Features to VM domain based on OS Type " + vmTO.getUuid());
         }
+    }
+
+    protected boolean setEnlightenWindowsVMFromDetails(final VirtualMachineTO vmTO, final FeaturesDef features) {
+        Map<String, String> details = vmTO.getDetails();
+        if (details == null) {
+            return false;
+        }
+        if(Boolean.parseBoolean(details.get(VmDetailConstants.ENLIGHTEN))) {
+            enlightenWindowsVmEnable(vmTO, features);
+            s_logger.info("Enabling KVM Enlightment Features to VM domain based on VM Details " + vmTO.getUuid());
+            return true;
+        else
+            return false;
+        }
+
+    protected void enlightenWindowsVmEnable(final VirtualMachineTO vmTO, final FeaturesDef features) {
+        LibvirtVMDef.HyperVEnlightenmentFeatureDef hyv = new LibvirtVMDef.HyperVEnlightenmentFeatureDef();
+        hyv.setFeature("relaxed", true);
+        hyv.setFeature("vapic", true);
+        hyv.setFeature("spinlocks", true);
+        hyv.setRetries(8096);
+        features.addHyperVFeature(hyv);
+        s_logger.info("Enabling KVM Enlightment Features to VM domain " + vmTO.getUuid());
     }
 
     protected void setEFIFromDetails(final VirtualMachineTO vmTO, final GuestDef guest) {
@@ -1992,9 +2010,10 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         features.addFeatures("apic");
         features.addFeatures("acpi");
 
-
-        //KVM hyperv enlightenment features based on OS Type
-        enlightenWindowsVm(vmTO, features);
+        //KVM hyperv enlightenment
+        if(setEnlightenWindowsVMFromDetails((vmTO, features) == false){
+            enlightenWindowsVmFromOS(vmTO, features);
+        }
 
         vm.addComp(features);
 
