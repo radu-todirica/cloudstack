@@ -54,6 +54,42 @@ public class UpdateServiceOfferingCmd extends BaseCmd {
     @Parameter(name = ApiConstants.SORT_KEY, type = CommandType.INTEGER, description = "sort key of the service offering, integer")
     private Integer sortKey;
 
+    @Parameter(name = ApiConstants.BYTES_READ_RATE, type = CommandType.LONG, required = false, description = "bytes read rate of the disk offering, long")
+    private Long diskBytesReadRate;
+
+    @Parameter(name = ApiConstants.BYTES_READ_RATE_MAX, type = CommandType.LONG, required = false, description = "maximum bytes read rate of the disk offering, long")
+    private Long diskBytesReadRateMax;
+
+    @Parameter(name = ApiConstants.BYTES_READ_RATE_MAX_LENGTH, type = CommandType.LONG, required = false, description = "maximum bytes read rate length of the disk offering, long")
+    private Long diskBytesReadRateMaxLength;
+
+    @Parameter(name = ApiConstants.BYTES_WRITE_RATE, type = CommandType.LONG, required = false, description = "bytes write rate of the disk offering, long")
+    private Long diskBytesWriteRate;
+
+    @Parameter(name = ApiConstants.BYTES_WRITE_RATE_MAX, type = CommandType.LONG, required = false, description = "maximum bytes write rate of the disk offering, long")
+    private Long diskBytesWriteRateMax;
+
+    @Parameter(name = ApiConstants.BYTES_WRITE_RATE_MAX_LENGTH, type = CommandType.LONG, required = false, description = "maximum bytes write rate length of the disk offering, long")
+    private Long diskBytesWriteRateMaxLength;
+
+    @Parameter(name = ApiConstants.IOPS_READ_RATE, type = CommandType.LONG, required = false, description = "iops read rate of the disk offering, long")
+    private Long diskIopsReadRate;
+
+    @Parameter(name = ApiConstants.IOPS_READ_RATE_MAX, type = CommandType.LONG, required = false, description = "maximum iops read rate of the disk offering, long")
+    private Long diskIopsReadRateMax;
+
+    @Parameter(name = ApiConstants.IOPS_READ_RATE_MAX_LENGTH, type = CommandType.LONG, required = false, description = "maximum iops read rate length of the disk offering, long")
+    private Long diskIopsReadRateMaxLength;
+
+    @Parameter(name = ApiConstants.IOPS_WRITE_RATE, type = CommandType.LONG, required = false, description = "iops write rate of the disk offering, long")
+    private Long diskIopsWriteRate;
+
+    @Parameter(name = ApiConstants.IOPS_WRITE_RATE_MAX, type = CommandType.LONG, required = false, description = "maximum iops write rate of the disk offering, long")
+    private Long diskIopsWriteRateMax;
+
+    @Parameter(name = ApiConstants.IOPS_WRITE_RATE_MAX_LENGTH, type = CommandType.LONG, required = false, description = "maximum iops write rate length of the disk offering, long")
+    private Long diskIopsWriteRateMaxLength;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -72,6 +108,90 @@ public class UpdateServiceOfferingCmd extends BaseCmd {
 
     public Integer getSortKey() {
         return sortKey;
+    }
+
+    public Long getDiskBytesReadRate() {
+        if(diskBytesReadRate != null && diskBytesReadRate == 0) {
+            return null;
+        }
+        return diskBytesReadRate;
+    }
+
+    public Long getDiskBytesReadRateMax() {
+        if(diskBytesReadRateMax != null && diskBytesReadRateMax == 0) {
+            return null;
+        }
+        return diskBytesReadRateMax;
+    }
+
+    public Long getDiskBytesReadRateMaxLength() {
+        if(diskBytesReadRateMaxLength != null && diskBytesReadRateMaxLength == 0) {
+            return null;
+        }
+        return diskBytesReadRateMaxLength;
+    }
+
+    public Long getDiskBytesWriteRate() {
+        if(diskBytesWriteRate != null && diskBytesWriteRate == 0) {
+            return null;
+        }
+        return diskBytesWriteRate;
+    }
+
+    public Long getDiskBytesWriteRateMax() {
+        if(diskBytesWriteRateMax != null && diskBytesWriteRateMax == 0) {
+            return null;
+        }
+        return diskBytesWriteRateMax;
+    }
+
+    public Long getDiskBytesWriteRateMaxLength() {
+        if(diskBytesWriteRateMaxLength != null && diskBytesWriteRateMaxLength == 0) {
+            return null;
+        }
+        return diskBytesWriteRateMaxLength;
+    }
+
+    public Long getDiskIopsReadRate() {
+        if(diskIopsReadRate != null && diskIopsReadRate == 0) {
+            return null;
+        }
+        return diskIopsReadRate;
+    }
+
+    public Long getDiskIopsReadRateMax() {
+        if(diskIopsReadRateMax != null && diskIopsReadRateMax == 0) {
+            return null;
+        }
+        return diskIopsReadRateMax;
+    }
+
+    public Long getDiskIopsReadRateMaxLength() {
+        if(diskIopsReadRateMaxLength != null && diskIopsReadRateMaxLength == 0) {
+            return null;
+        }
+        return diskIopsReadRateMaxLength;
+    }
+
+    public Long getDiskIopsWriteRate() {
+        if(diskIopsWriteRate != null && diskIopsWriteRate == 0) {
+            return null;
+        }
+        return diskIopsWriteRate;
+    }
+
+    public Long getDiskIopsWriteRateMax() {
+        if(diskIopsWriteRateMax != null && diskIopsWriteRateMax == 0) {
+            return null;
+        }
+        return diskIopsWriteRateMax;
+    }
+
+    public Long getDiskIopsWriteRateMaxLength() {
+        if(diskIopsWriteRateMaxLength != null && diskIopsWriteRateMaxLength == 0) {
+            return null;
+        }
+        return diskIopsWriteRateMaxLength;
     }
 
     /////////////////////////////////////////////////////

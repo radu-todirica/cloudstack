@@ -1601,6 +1601,55 @@
                                         name: args.data.name,
                                         displaytext: args.data.displaytext
                                     };
+                                    if (args.data.diskBytesReadRate != null && args.data.diskBytesReadRate.length > 0) {
+                                        $.extend(data, {
+                                            bytesreadrate: args.data.diskBytesReadRate
+                                        });
+                                    }if (args.data.diskBytesReadRateMax != null && args.data.diskBytesReadRateMax.length > 0) {
+                                        $.extend(data, {
+                                            bytesreadratemax: args.data.diskBytesReadRateMax
+                                        });
+                                    }if (args.data.diskBytesReadRateMaxLength != null && args.data.diskBytesReadRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            bytesreadratemaxlength: args.data.diskBytesReadRateMaxLength
+                                        });
+                                    }if (args.data.diskBytesWriteRate != null && args.data.diskBytesWriteRate.length > 0) {
+                                        $.extend(data, {
+                                            byteswriterate: args.data.diskBytesWriteRate
+                                        });
+                                    }if (args.data.diskBytesWriteRateMax != null && args.data.diskBytesWriteRateMax.length > 0) {
+                                        $.extend(data, {
+                                            byteswriteratemax: args.data.diskBytesWriteRateMax
+                                        });
+                                    }if (args.data.diskBytesWriteRateMaxLength != null && args.data.diskBytesWriteRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            byteswriteratemaxlength: args.data.diskBytesWriteRateMaxLength
+                                        });
+                                    }if (args.data.diskIopsReadRate != null && args.data.diskIopsReadRate.length > 0) {
+                                        $.extend(data, {
+                                            iopsreadrate: args.data.diskIopsReadRate
+                                        });
+                                    }if (args.data.diskIopsReadRateMax != null && args.data.diskIopsReadRateMax.length > 0) {
+                                        $.extend(data, {
+                                            iopsreadratemax: args.data.diskIopsReadRateMax
+                                        });
+                                    }if (args.data.diskIopsReadRateMaxLength != null && args.data.diskIopsReadRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            iopsreadratemaxlength: args.data.diskIopsReadRateMaxLength
+                                        });
+                                    }if (args.data.diskIopsWriteRate != null && args.data.diskIopsWriteRate.length > 0) {
+                                        $.extend(data, {
+                                            iopswriterate: args.data.diskIopsWriteRate
+                                        });
+                                    }if (args.data.diskIopsWriteRateMax != null && args.data.diskIopsWriteRateMax.length > 0) {
+                                        $.extend(data, {
+                                            iopswriteratemax: args.data.diskIopsWriteRateMax
+                                        });
+                                    }if (args.data.diskIopsWriteRateMaxLength != null && args.data.diskIopsWriteRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            iopswriteratemaxlength: args.data.diskIopsWriteRateMaxLength
+                                        });
+                                    }
                                     $.ajax({
                                         url: createURL('updateServiceOffering'),
                                         data: data,
@@ -2653,6 +2702,55 @@
                                     var data = {
                                         id: args.context.diskOfferings[0].id
                                     };
+                                    if (args.data.diskBytesReadRate != null && args.data.diskBytesReadRate.length > 0) {
+                                        $.extend(data, {
+                                            bytesreadrate: args.data.diskBytesReadRate
+                                        });
+                                    }if (args.data.diskBytesReadRateMax != null && args.data.diskBytesReadRateMax.length > 0) {
+                                        $.extend(data, {
+                                            bytesreadratemax: args.data.diskBytesReadRateMax
+                                        });
+                                    }if (args.data.diskBytesReadRateMaxLength != null && args.data.diskBytesReadRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            bytesreadratemaxlength: args.data.diskBytesReadRateMaxLength
+                                        });
+                                    }if (args.data.diskBytesWriteRate != null && args.data.diskBytesWriteRate.length > 0) {
+                                        $.extend(data, {
+                                            byteswriterate: args.data.diskBytesWriteRate
+                                        });
+                                    }if (args.data.diskBytesWriteRateMax != null && args.data.diskBytesWriteRateMax.length > 0) {
+                                        $.extend(data, {
+                                            byteswriteratemax: args.data.diskBytesWriteRateMax
+                                        });
+                                    }if (args.data.diskBytesWriteRateMaxLength != null && args.data.diskBytesWriteRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            byteswriteratemaxlength: args.data.diskBytesWriteRateMaxLength
+                                        });
+                                    }if (args.data.diskIopsReadRate != null && args.data.diskIopsReadRate.length > 0) {
+                                        $.extend(data, {
+                                            iopsreadrate: args.data.diskIopsReadRate
+                                        });
+                                    }if (args.data.diskIopsReadRateMax != null && args.data.diskIopsReadRateMax.length > 0) {
+                                        $.extend(data, {
+                                            iopsreadratemax: args.data.diskIopsReadRateMax
+                                        });
+                                    }if (args.data.diskIopsReadRateMaxLength != null && args.data.diskIopsReadRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            iopsreadratemaxlength: args.data.diskIopsReadRateMaxLength
+                                        });
+                                    }if (args.data.diskIopsWriteRate != null && args.data.diskIopsWriteRate.length > 0) {
+                                        $.extend(data, {
+                                            iopswriterate: args.data.diskIopsWriteRate
+                                        });
+                                    }if (args.data.diskIopsWriteRateMax != null && args.data.diskIopsWriteRateMax.length > 0) {
+                                        $.extend(data, {
+                                            iopswriteratemax: args.data.diskIopsWriteRateMax
+                                        });
+                                    }if (args.data.diskIopsWriteRateMaxLength != null && args.data.diskIopsWriteRateMaxLength.length > 0) {
+                                        $.extend(data, {
+                                            iopswriteratemaxlength: args.data.diskIopsWriteRateMaxLength
+                                        });
+                                    }
                                     $.ajax({
                                         url: createURL('listDiskOfferings&isrecursive=true'),
                                         data: data,
