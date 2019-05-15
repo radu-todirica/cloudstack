@@ -1888,18 +1888,27 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         }
     }
 
+    // Returns true if enlightenment vm detail was passed, and if that value evaluates to true it will apply
+    // enlightment to the domain.  Note - if enlightenment vm detail is passed and evaluates to false,
+    // true is returned here but enlightenment is not added to the domain.  This allows us to override
+    // OS type values that might otherwise result in enlightenment being added, such as Windows*
     protected boolean setEnlightenWindowsVMFromDetails(final VirtualMachineTO vmTO, final FeaturesDef features) {
         Map<String, String> details = vmTO.getDetails();
         if (details == null) {
             return false;
         }
-        if(Boolean.parseBoolean(details.get(VmDetailConstants.ENLIGHTEN))) {
-            enlightenWindowsVmEnable(vmTO, features);
-            s_logger.info("Enabling KVM Enlightment Features to VM domain based on VM Details " + vmTO.getUuid());
+
+
+        String enlighten = details.get(VmDetailConstants.ENLIGHTENMENT);
+        if (enlighten != null) {
+            if (Boolean.parseBoolean(enlighten)) {
+                enlightenWindowsVmEnable(vmTO, features);
+                s_logger.info("Enabling KVM Enlightment Features to VM domain based on VM Details " + vmTO.getUuid());
+            }
             return true;
-        else
-            return false;
         }
+        return false;
+    }
 
     protected void enlightenWindowsVmEnable(final VirtualMachineTO vmTO, final FeaturesDef features) {
         LibvirtVMDef.HyperVEnlightenmentFeatureDef hyv = new LibvirtVMDef.HyperVEnlightenmentFeatureDef();
@@ -2011,7 +2020,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         features.addFeatures("acpi");
 
         //KVM hyperv enlightenment
-        if(setEnlightenWindowsVMFromDetails((vmTO, features) == false){
+        if(!setEnlightenWindowsVMFromDetails(vmTO, features)) {
             enlightenWindowsVmFromOS(vmTO, features);
         }
 
