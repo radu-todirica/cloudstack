@@ -570,6 +570,24 @@ public class ApiConstants {
     public static final String VSWITCH_TYPE_PUBLIC_TRAFFIC = "publicvswitchtype";
     public static final String VSWITCH_NAME_GUEST_TRAFFIC = "guestvswitchname";
     public static final String VSWITCH_NAME_PUBLIC_TRAFFIC = "publicvswitchname";
+    // Tungsten controller
+    public static final String TUNGSTEN_NETWORK_SUBNET_NAME = "tungstensubnetname";
+    public static final String TUNGSTEN_NETWORK_UUID = "tungstennetworkuuid";
+    public static final String TUNGSTEN_NETWORK_IPAM_UUID= "tungstennetworkipamuuid";
+    public static final String TUNGSTEN_ADDR_FROM_START = "tungstenaddrfromstart";
+    public static final String TUNGSTEN_IP_ALLOC_POOL_START = "tungstenipallocpoolstart";
+    public static final String TUNGSTEN_IP_ALLOC_POOL_END = "tungstenipallocpoolend";
+    public static final String TUNGSTEN_DNS_NAME_SERVERS = "tungstendnsnameservers";
+    public static final String TUNGSTEN_NETWORK_ENABLE_DHC = "tungstennetworkenabledhcp";
+    public static final String TUNGSTEN_NETWORK_DEFAULT_GATEWAY = "tungstennetworkdefaultgateway";
+    public static final String TUNGSTEN_NETWORK_SUBNET_IP_PREFIX = "tungstennetworksubnetipprefix";
+    public static final String TUNGSTEN_NETWORK_SUBNET_IP_PREFIX_LEN = "tungstennetworksubnetipprefixlen";
+    public static final String TUNGSTEN_VIRTUAL_MACHINE_UUID = "tungstenvirtualmachineuuid";
+    public static final String TUNGSTEN_SECURITY_GROUP_UUID = "tungstensecuritygroupuuid";
+    public static final String TUNGSTEN_PROJECT_UUID = "tungstenprojectuuid";
+    public static final String TUNGSTEN_VM_INTERFACE_UUID = "tungstenvminterfaceuuid";
+    public static final String TUNGSTEN_INSTANCE_IP_ADDRESS = "tungsteninstanceipaddress";
+    public static final String TUNGSTEN_VM_INTERFACE_MAC_ADDRESSES = "tungstenvminterfacemacaddresses";
     // Ovs controller
     public static final String OVS_DEVICE_ID = "ovsdeviceid";
     public static final String OVS_DEVICE_NAME = "ovsdevicename";
@@ -812,6 +830,10 @@ public class ApiConstants {
     public static final String BOOT_TYPE = "boottype";
     public static final String BOOT_MODE = "bootmode";
     public static final String BOOT_INTO_SETUP = "bootintosetup";
+    public static final String PARENT_TYPE = "parenttype";
+    public static final String PARENT = "parent";
+    public static final String FQ_NAME = "fqname";
+    public static final String PARENT_UUID = "parentuuid";
 
     public enum BootType {
         UEFI, BIOS;
