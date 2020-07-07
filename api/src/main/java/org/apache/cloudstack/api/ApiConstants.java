@@ -578,7 +578,7 @@ public class ApiConstants {
     public static final String TUNGSTEN_IP_ALLOC_POOL_START = "tungstenipallocpoolstart";
     public static final String TUNGSTEN_IP_ALLOC_POOL_END = "tungstenipallocpoolend";
     public static final String TUNGSTEN_DNS_NAME_SERVERS = "tungstendnsnameservers";
-    public static final String TUNGSTEN_NETWORK_ENABLE_DHC = "tungstennetworkenabledhcp";
+    public static final String TUNGSTEN_NETWORK_ENABLE_DHCP = "tungstennetworkenabledhcp";
     public static final String TUNGSTEN_NETWORK_DEFAULT_GATEWAY = "tungstennetworkdefaultgateway";
     public static final String TUNGSTEN_NETWORK_SUBNET_IP_PREFIX = "tungstennetworksubnetipprefix";
     public static final String TUNGSTEN_NETWORK_SUBNET_IP_PREFIX_LEN = "tungstennetworksubnetipprefixlen";
